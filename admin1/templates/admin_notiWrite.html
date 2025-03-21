@@ -1,0 +1,99 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="{% static 'css/admin1/admin_notiWrite.css'%}">
+<link rel="stylesheet" href="{% static 'css/admin1/admin_login.css'%}">
+<script  src="http://code.jquery.com/jquery-latest.min.js"></script>
+
+<script>
+	if('{{request.session.session_role}}'=='1'){
+		alert("접근 권한이 없습니다.")
+		location.href = '/admin1/admin_memList/'
+	}
+	$(function(){
+		$("#a_logout").click(function(){
+			if(confirm("로그아웃 하시겠습니까?")){
+				location.href='/admin1/logout/'
+			}
+		})
+		$("#addBtn").click(function(){
+			if($("#title").val().length<1){
+				alert("제목을 입력하세요.")
+				return false;
+			}
+			if(confirm("공지사항을 등록하시겠습니까?")){
+				addFrm.submit();
+			}
+		})
+	})
+	function readURL(input){
+		//alert(input + " 이미지가 추가되었습니다.")
+		if(input.files && input.files[0]){
+			var reader = new FileReader();
+			reader.onload = function(e){
+				document.getElementById('preview').src = e.target.result;
+			}
+			reader.readAsDataURL(input.files[0])
+		}else{
+			document.getElementById('preview').src = "";
+		}
+	}
+</script>
+
+<title>공지사항 등록</title>
+
+</head>
+
+<body>
+	<nav class="gnb">
+		<a href="#" class="logo"><img src="/static/images/admin1/logo_sample.png" alt=""></a>
+		<div class="menu">
+			<a href="/admin1/admin_memList/">회원관리</a>
+			<a href="#">판매관리</a>
+			<a href="/admin1/admin_noticeList/" class='active'>공지사항</a>
+			<a href="/admin1/admin_postList/">포스트</a>
+			<a href="/admin1/admin_qList/" >1:1문의</a>
+			<a href="/admin1/admin_adminList/">관리자설정</a>
+			<a id='a_logout'>로그아웃</a>
+		</div>
+	</nav>
+	<div class="container">
+		<div class="con_header">
+			<h2>공지사항 등록</h2>
+		</div>
+		<div id="write_wrap">
+			<form action="" method="POST" id="addFrm" name="addFrm" enctype="multipart/form-data">
+				{% csrf_token %}
+				<label for="title">제목</label>
+				<br>
+				<input type="text" id="title" name="title" placeholder="제목을 입력하세요" required>
+				<br>
+				<label>작성자</label>
+				<span>관리자</span>
+				<br>
+				<br>
+				<label>내용</label>
+				<br>
+				<textarea name="content" id="content"	placeholder="내용을 입력해주세요."></textarea>
+				<br>
+				<label for="file">이미지첨부</label>
+				<input type="file" onchange="readURL(this);" name="bfile" id="file">
+				<br>
+				<label>이미지 미리보기</label><br>
+				<img id="preview" src="" style="width: 600px;">
+				<br>
+				<br>
+				<div class='btn_wrap'>
+					<button type="button" id='addBtn'>공지사항 등록</button>
+					<button type="button">취소</button>
+				</div>
+			</form>
+
+		</div>
+	</div>
+	
+</body>
+</html>

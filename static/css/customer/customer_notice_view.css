@@ -1,0 +1,193 @@
+/* 기본틀 */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
+}
+
+a{
+  text-decoration: none;
+}
+
+body, html {
+  height: 100%;
+}
+
+
+table, tr, td{
+  border-collapse: collapse;
+  color: #333;
+  font-size: 14px;
+}
+
+/* container */
+#container{
+  width: 100%;
+  min-height: 100vh; /* 화면 높이와 동일하게 설정 */
+  padding: 100px 180px 300px 334px;
+}
+
+#customer_notice_menu{
+  width: 100%;
+  height: 70px;
+  margin-bottom: 25px;
+}
+
+#customer_notice_menu span{
+  color:#797979; 
+
+}
+
+
+/* 게시글 상단 */
+#customer_view_top{
+  width: 100%;
+  display: flex;
+  position: relative;
+  justify-content: space-between;
+}
+
+.modify_del_slide{
+  height: 98px;
+  float: right;
+}
+
+.modify_del_slide img{
+  width: 100%;
+}
+
+.customer_view_title h2{
+  font-size: 22px;
+  margin-bottom: 17px;
+}
+
+.customer_view_title span{
+  width: 100%;
+  display: block;
+  font-size: 16px;
+  color: #444444;
+  margin-bottom: 6px;
+}
+
+/* 일기내용 */
+#customer_content{
+  width: 100%;
+  margin-bottom: 100px;
+}
+
+#customer_content p{
+  margin: 20px 0 20px 0;
+  line-height: 35px;
+}
+
+#customer_content img{
+  width: 50%;
+  margin: 0 auto;
+  display: block;
+}
+
+
+
+/* 다이어리 반응 */
+.customer_react {
+  display: flex;
+  font-size: 14px;
+  color: #333;
+  margin-bottom: 40px;
+}
+
+.customer_react .back_list{
+  width: 90px;
+  height: 40px;
+  border: 1px solid #ddd;
+  border-radius: 50px;
+  text-align: center;
+  padding-top: 7px;
+  margin-right: 5px;
+  cursor: pointer;
+}
+
+.customer_react .back_write{
+  width: 190px;
+  height: 40px;
+  border: 1px solid #ddd;
+  border-radius: 50px;
+  text-align: center;
+  padding-top: 11px;
+  margin-right: 5px;
+  cursor: pointer;
+}
+
+.back_list span{
+  line-height: 25px;
+  text-align: center;
+  vertical-align: middle; 
+  display: inline-block;
+  width: 50px;
+}
+
+
+
+/* 모달 */
+ /* 이미지와 슬라이드 창 컨테이너 */
+ #modify_del_slide_1, #modify_del_slide_2 {
+  position: relative; /* 슬라이드 창 위치를 이 요소를 기준으로 설정 */
+  position: absolute;
+  right: 0;
+}
+
+/* 슬라이드 창(모달) 스타일 */
+.sub_menu_modal {
+  display: none; /* 기본적으로 숨김 */
+  position: absolute; /* 이미지의 바로 옆에 표시되도록 설정 */
+  /*left: 100%;  이미지 바로 오른쪽에 위치 */
+  left: 0; /* 이미지 바로 오른쪽에 위치 */
+  width: 60px; /* 모달의 크기를 버튼 크기에 맞춰 설정 */
+  background-color: white;
+  color: rgb(87, 78, 78);
+  text-align: center;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); /* 심플한 그림자 효과 */
+  transition: transform 0.3s ease-in-out; /* 애니메이션 효과 */
+  transform: translateY(-20px); /* 초기 상태에서 살짝 위에 위치 */
+  cursor: pointer;
+}
+
+/* 슬라이드 창이 열릴 때 */
+.sub_menu_modal.open {
+  display: block; /* 슬라이드 창 표시 */
+  transform: translateY(0); /* 슬라이드 창을 아래로 내려온 상태로 설정 */
+}
+
+/* 버튼들이 가로로 정렬되도록 설정 */
+#sub_menu_content {
+  display: flex;
+  flex-direction: column; /* 버튼을 세로로 나열 */
+  gap: 2px; /* 버튼 간 간격 */
+}
+
+/* 버튼 스타일 */
+.sub_menu_modal button {
+  width: 100%; /* 버튼 너비를 100%로 설정하여 모달의 너비에 맞게 확장 */
+  height: 33px;
+  background-color: white;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.sub_menu_modal #editButton_1, .sub_menu_modal #editButton_2 {
+  color: black;
+  border: 1px solid #d9d9d9;
+}
+
+.sub_menu_modal #deleteButton_1, .sub_menu_modal #deleteButton_2 {
+  color: #FF4141;
+  border: 1px solid #FF8C8C;
+}
+
+/* 버튼 호버 효과 */
+.sub_menu_modal button:hover {
+  background-color: #0056b3;
+  color: white;
+}

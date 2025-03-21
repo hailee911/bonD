@@ -1,0 +1,27 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>아이디 찾기 페이지</title>
+  <link rel="stylesheet" href="{% static '/css/login/join1.css'%}">
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
+</head>
+<body>
+  <div class="container">
+    <div class="image-section">
+      <img src="{% static '/images/login/join_login_index.svg'%}" alt="">
+      </svg>
+    </div>
+    <div class="join_form">
+        <div id="id2_f1">아이디를 찾았어요.</div>
+        <div id="id2_f2">회원가입시 입력한 정보로 찾을게요.</div>
+        <div id="id2_f3">회원님의 아이디는</div>
+        <div id="id2_f4">{{user_id}}  에요.</div>
+        <a href="/loginpage/pw/"><button type="submit" id="id2_w1">비밀번호 찾기</button></a>
+        <a href="/loginpage/login/"><button type="button" id="id2_w2">로그인 하러가기</button></a>
+      </div>
+    </div>
+  </body>
+</html>

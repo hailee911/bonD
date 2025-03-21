@@ -1,0 +1,525 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="csrf-token" content="{{ csrf_token }}">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="{% static '/css/diary/Mdiary_list.css'%}">
+  <link rel="stylesheet" href="{% static '/css/home/main.css'%}">
+  <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
+  <script  src="http://code.jquery.com/jquery-latest.min.js"></script>
+  <title>내 다이어리 목록</title> 
+</head>
+
+<!-- 공통 상단좌측메뉴 -->
+<script>
+  $(function() {
+		// GNB 클릭
+		$('#menu ul li').on('click', function() {
+			$('#menu ul li').removeClass('active');
+			$(this).addClass('active');
+		});
+
+		// 검색창
+    $('#searchBtn').click(function(){
+			$("#main_search").removeClass('closed').addClass('open');
+			$('#s_overlay').addClass('show');
+		});
+	$('#search_closeBtn').click(function(){
+		$("#main_search").removeClass('open').addClass('closed');
+		$('#s_overlay').removeClass('show');
+	});
+	$('#s_overlay').click(function() { //배경 클릭하면 닫히게
+		$('#main_search').removeClass('open').addClass('closed');
+		$('#s_overlay').removeClass('show');
+	});
+	// 검색창 검색기능
+	$('.search_box input').on('keypress', function(event){
+		if (event.key == 'Enter') {
+			event.preventDefault(); // 기본 제출 방지
+			// 입력값과 일치하는 일기 찾기
+			ctitle = "{{Content.ctitle}}"
+			cdate = "{{Content.cdate}}"
+			ccontent = "{{Content.ccontent}}"
+			cno = "{{Content.cno}}"
+			//ajax 구문
+			$.ajax({
+				headers:{"X-CSRFToken":$("meta[name='csrf-token']").attr("content")},
+				url:"/main/search/",
+				type:"post",
+				data:{"csearch":$("#csearch").val()}, //views.py데이터 보냄
+				success:function(data){
+					//data -> 넘어온 검색결과
+					console.log("리스트 : "+data.list_qs)
+					console.log("리스트 : "+data.list_qs[0])
+					console.log("리스트개수 : "+data.list_qs.length)
+					//html보내는 부분
+					var hdata = ""
+					// 검색 결과가 있을 경우
+					if (data.list_qs.length > 0){
+						hdata += `<div id="search_result">검색 결과 <span>(${data.list_qs.length})</span></div>`
+						for(var i=0;i<data.list_qs.length;i++){
+							// cdate를 Date 객체로 변환 > 0년0월0일로 형식 변환
+							var cdate = new Date(data.list_qs[i].cdate);
+							var formattedDate = cdate.getFullYear() + "년 " + (cdate.getMonth() + 1) + "월 " + cdate.getDate() + "일";
+							hdata += `<div class="search_list"><a href="/diary/diary_view/${data.list_qs[i].cno}/" class="result-item">
+								<span class="s_title"> ${data.list_qs[i].ctitle}</span>
+								<span class="s_date">${formattedDate}</span>
+								<img src="/static/images/home/right.png" alt="">
+								</a>
+								</div>`;
+								}
+					}else{
+						// 검색 결과가 없을 경우
+						hdata += `<div id="search_result">검색 결과 <span>(${data.list_qs.length})</span></div>`
+						hdata += `<div class="search_list"><a>
+							<span class="s_title">검색하신 내용과 일치하는 결과가 없어요.</span>
+							<span class="s_date"></span>
+						</a></div>`;
+					}
+							$("#search_content").html(hdata);
+						},
+						error:function(){
+							alert("에러")
+						}
+					})
+				}
+    });
+
+	});
+
+	// -------------알림창-----------------
+	$(function() {
+    // 페이지 로드 시 알림 상태 확인
+    fetchNotifications();
+
+    // 알림창 열기
+    $('#notiBtn').click(function() {
+        $('#noti_side').removeClass('closed').addClass('open');
+        $('#n_overlay').addClass('show');
+
+        // 알림 데이터 가져오기
+        fetchNotifications();
+    });
+
+    // 알림창 닫기
+    $('#noti_closeBtn, #n_overlay').click(function() {
+        $('#noti_side').removeClass('open').addClass('closed');
+        $('#n_overlay').removeClass('show');
+    });
+
+    // 알림 데이터 가져오는 함수
+    function fetchNotifications() {
+        $.ajax({
+            url: '/main/notification/', // 알림 데이터를 가져올 URL
+            method: 'GET',
+            success: function(data) {
+                let hasUnread = false; // 읽지 않은 알림 여부
+                let hdata = ""; // 알림 내용을 담을 HTML
+
+                if (data.notifications.length > 0) {
+                    data.notifications.forEach(function(notification) {
+                        if (!notification.checked) {
+                            hasUnread = true; // 읽지 않은 알림 존재
+                        }
+                        hdata += `
+                            <li class="noti_list ${notification.checked ? 'checked' : ''}" data-id="${notification.id}">
+                                <a>
+                                    <div>
+                                        <img src="/static/images/home/default_profile.png" alt="프로필이미지">
+                                    </div>
+                                    <div>
+                                        <p>${notification.message}</p>
+                                        <p class="noti_date">${notification.ndate}</p>
+                                    </div>
+                                </a>
+                            </li>
+                        `;
+                    });
+                } else {
+                    hdata = `
+                        <li class="noti_list">
+                            <p>새로운 알림이 없습니다.</p>
+                        </li>
+                    `;
+                }
+
+                $('#noti_list').html(hdata); // 알림 UI 업데이트
+
+                // 빨간 점 표시
+                if (hasUnread) {
+                    $('#notiBtn .notification-dot').show(); // 읽지 않은 알림이 있으면 빨간 점 표시
+                } else {
+                    $('#notiBtn .notification-dot').hide(); // 없으면 숨김
+                }
+            },
+            error: function(error) {
+                console.error('Error fetching notifications:', error);
+            }
+        });
+    }
+
+    // 알림 리스트 클릭 시 배경색 변경 및 읽음 처리
+    $('#noti_list').on('click', '.noti_list', function () {
+        const notificationId = $(this).data('id'); // 알림 ID 가져오기
+
+        if (notificationId) {
+            $(this).addClass('read'); // 읽음 상태로 변경
+            $(this).css('background-color', 'white'); // 즉시 배경색 변경
+
+            // 서버에 읽음 상태 동기화 요청
+            markNotificationAsRead(notificationId);
+        }
+    });
+
+    // 알림 읽음 처리 함수
+    function markNotificationAsRead(notificationId) {
+        $.ajax({
+            url: `/main/notification_read/${notificationId}/`, // 알림 읽음 처리 URL
+            method: 'POST',
+            headers: { 'X-CSRFToken': $("meta[name='csrf-token']").attr("content") },
+            success: function () {
+                console.log('Notification marked as read.');
+                // 읽음 상태 업데이트 후 빨간 점 재확인
+                fetchNotifications();
+            },
+            error: function (error) {
+                console.error('Error marking notification as read:', error);
+            }
+        });
+    }
+
+    // 5초마다 읽지 않은 알림 상태 확인
+    setInterval(fetchNotifications, 5000);
+  });
+</script>
+</head>
+<body>
+	<!-- 최상단 메뉴 -->
+	<div id="top_nav">
+		<h1><a href="/main/index/"></a></h1>
+		<ul class="top_menu">
+			<li><a id="searchBtn"><img src="/static/images/home/search_icon.png" alt=""></a></li>
+			<li>
+				<a id="notiBtn">
+						<img src="/static/images/home/bell_off_icon.png" alt="">
+						<span class="notification-dot"></span> <!-- 빨간점을 표시할 요소 추가 -->
+				</a>
+		</li>
+			<li><a href="/mypage/main/">마이페이지</a></li>
+		</ul>
+
+	</div>
+
+<!-- 좌측 gnb -->
+<div id="gnb">
+
+  <!-- 프로필 -->
+  <div id="user_profile">
+    <div id="pimg">
+      <img src="{{ qb.img.url }}" alt="" />
+    </div>
+    <p id="uName">{{info.name}}</p>
+    <p id="uEmail">{{info.mail}}</p>
+  </div>
+
+  <!-- Nav -->
+  <nav id="menu">
+    <ul>
+      <a href="/main/index/"><li class="menu_item">우리 가족 이야기</li></a>
+      <a href="/diary/diaryHome/"><li class="menu_item active">다이어리</li></a>
+      <a href="/emotion/main/"><li class="menu_item">감정 돌아보기</li></a>
+      <a href="/family1/fam/"><li class="menu_item">우리가족</li></a>
+      <a href="/calendar1/cal/"><li class="menu_item">캘린더</li></a>
+      <a href="/customer/"><li class="menu_item">알려드려요</li></a>
+    </ul>
+  </nav>
+
+  <!-- logout -->
+  <div id="logout">
+    <a href="/main/logout/"><span>로그아웃</span></a>
+  </div>
+  
+</div>
+
+<!-- 검색창 슬라이드 -->
+<div id="s_overlay" class="s_overlay"></div>
+<div id="main_search" class="search_bar closed">
+  <div id="input_wrap">
+    <form action="/main/search/" method="POST" name="searchFrm" id="searchFrm">
+      <div class="search_box">
+        {% csrf_token %}
+        <input type="text" id="csearch" placeholder="다이어리에서 찾고 싶은 내용을 입력하세요.">
+        <img src="/static/images/home/search_icon.png" alt="">
+      </div>
+    </form>
+      <button type="button" id="search_closeBtn">
+        <img src="/static/images/home/close_icon.png" alt="알림창닫기">
+      </button>
+  </div>
+    <div id="search_content">
+      <div id="search_result">
+      </div>
+      <div class="search_list">
+        <a>
+          <span class="s_title">찾고자 하는 일기를 검색해 보세요.</span>
+          <span class="s_date"></span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+<!-- 알림창 슬라이드 -->
+<div id="n_overlay" class="n_overlay"></div>
+<div id="noti_side" class="sidebar closed">
+  <div class="noti_header">
+    <h2>알림</h2>
+    <button id="noti_closeBtn"><img src="/static/images/home/close_icon.png" alt="알림창닫기"></button>
+  </div>
+  <ul id="noti_list">
+    {% for notification in notifications %}
+    <li class="noti_list {% if notification.checked %}checked{% endif %}">
+        <a href="#">
+            <div>
+                <img src="/static/images/home/default_profile.png" alt="프로필이미지">
+            </div>
+            <div>
+                <p>{{ notification.message }}</p>
+                <p class="noti_date">{{ notification.ndate|date:"Y-m-d H:i" }}</p>
+            </div>
+        </a>
+    </li>
+    {% empty %}
+    <li class="noti_list">
+        <p>새로운 알림이 없습니다.</p>
+    </li>
+    {% endfor %}
+</ul>
+</div>
+
+<!-- 공통 상단좌측메뉴 -->
+
+
+<!-- 다이어리 리스트 -->
+<div id="main_area">
+
+  <div id="title_area">
+    <p id="infoTit">
+      {% comment %} {% if mdiary %} {% endcomment %}
+      <p id="p_mtitle">{{mdiary.mtitle}}</p>
+      <input type="text" name="i_mtitle" id="i_mtitle" value="{{mdiary.mtitle}}" style="display: none;">
+      {% comment %} {% else %} {% endcomment %}
+        {% comment %} 내 다이어리 이름을 설정해 주세요. {% endcomment %}
+      {% comment %} {% endif %} {% endcomment %}
+        <span>
+          <div id="modify_del_slide_1">
+          <button type="button" id="addBtn">
+          <img src="/static/images/customer/addBtn.png" alt="" id="openModal_1" style="cursor: pointer;">
+          </button>
+        </span>
+        <span>
+          <button type="button" class="wBtn"><a href="/diary/diaryWrite/"><img id="writeBtn" src="/static/images/diary/writeBtn.png" alt=""></a></button> 
+          <div class="sub_menu_modal" id="sub_menu_modal_1">
+            <div id="sub_menu_content">
+              <button type="button" id="diaryEditBtn">다이어리 수정</button>
+              <button type="button" id="diaryDeleteBtn">다이어리 삭제</button>
+              <button type="button" id="diarySaveBtn" style="display:none">제목 변경하기</button>
+              <button type="button" id="cancleBtn" style="display:none">취소</button>
+            </div>
+          </div>
+        </div>
+      </span>
+    </p>
+    
+
+
+    <p id="dateTit">{{mdiary.mdate|date:"Y년 m월 d부터 씀"}}</p>
+  </div>
+  
+  <div id="list_area">
+    {% if content %}
+    {% for c in content %}
+    <div class="list_group">
+      <a href="/diary/diary_view/{{c.cno}}/?pageNum={{forloop.revcounter}}">
+        <div class="wrap_cont">
+          {% if c.group_diary.all %}
+          <span class="tit_post"><span class="num_txt">{{forloop.revcounter}}</span>{{c.ctitle}}<span class="img"></span></span>
+          {% else %}
+          <span class="tit_post"><span class="num_txt">{{forloop.revcounter}}</span>{{c.ctitle}}<span class="img"><img src="/static/images/diary/lock.png" alt=""></span></span>
+          {% endif %}
+          <p class="desc_cont">
+            <span class="diaryTit">{{mdiary.mtitle}}</span><span class="space"> | </span>
+            <span class="list_txt">{{c.ccontent}}
+            </span>
+          </p>
+        </div>
+        <dl class="list_post_info">
+          <dd class="txt_g">
+            <span>{{ c.cdate|date:"Y.m.d" }}</span><span class="space"> | </span>
+          </dd>
+        </dl>
+      </a>
+    </div>
+    {% endfor %}
+    {% else %}
+    일기를 작성해봅시다!🙌
+    {% endif %}
+    </div>
+
+  </div>
+
+  <ul class="page_num">
+    <!-- 이전페이지 확인 -->
+    {% if MdiaryList.has_previous %}
+      <a href="?npage=1"><li class="first"><img src="/static/images/diary/left_double.png" alt=""></li></a>
+      <a href="?npage={{MdiaryList.previous_page_number}}"><li class="prev"><img src="/static/images/diary/left.png" alt=""></li></a>
+    {% else %}
+      <li class="first"></li>
+      <li class="prev"></li>
+    {% endif %}
+
+    <!-- 순차적 페이지 넘버링 -->
+    {% for page in MdiaryList.paginator.page_range %}
+      {% if page == MdiaryList.number %}
+        <a href="#"><li class="nowNum"><strong>{{page}}</strong></li></a>
+      {% else %}
+        <a href="?npage={{page}}"><li class="num"><div>{{page}}</div></li></a>
+    {% comment %} <li class="nowNum"><a href="#">1</a></li> {% endcomment %}
+      {% endif %}
+    {% endfor %}
+
+    <!-- 이후페이지 확인 -->
+    {% if MdiaryList.has_next %}
+      <a href="?npage={{diary.next_page_number}}"><li class="next"><img src="/static/images/diary/right.png" alt=""></li></a>
+      <a href="?npage={{diary.paginator.num_pages}}"><li class="last"><img src="/static/images/diary/right_double.png" alt=""></li></a>
+    {% else %}
+      <li class="next"></li>
+      <li class="last"></li>
+    {% endif %}
+
+  </ul>
+</div>
+
+<script>
+  const csrftoken = '{{ csrf_token }}';
+  // 다이어리 삭제
+  $(function(){
+    $("#diaryDeleteBtn").click(function(){
+      if (confirm("다이어리 내용을 전부 삭제하시겠어요? 삭제 시 복구가 불가해요.")) {
+        location.href = "/diary/delete_all/";
+      } else {
+        // 취소 버튼 클릭 시 아무 동작도 하지 않음
+        return false;
+      }
+    });
+  });
+
+  // 다이어리 제목 수정
+  $(function(){
+    $("#diaryEditBtn").click(function(){
+      $("#p_mtitle").hide(); 
+      $("#i_mtitle").show();
+      $("#diaryEditBtn").hide();
+      $("#diaryDeleteBtn").hide();
+      $("#diarySaveBtn").show();
+      $("#cancleBtn").show();
+            
+      // 입력 상자에 커서를 이동
+      // 약간의 지연을 추가하여 커서를 텍스트 끝으로 이동
+      setTimeout(function() {
+        const inputElement = document.getElementById('i_mtitle');
+        setCursorToEnd(inputElement);
+      }, 10); // 10ms 지연
+
+    });
+  });
+
+  // 입력 상자에 커서를 텍스트 끝으로 이동시키는 함수
+  function setCursorToEnd(inputElement) {
+    const value = inputElement.value; // 입력 상자의 현재 값
+    inputElement.focus(); // 입력 상자를 포커스
+    inputElement.setSelectionRange(value.length, value.length); // 커서를 텍스트 끝으로 이동
+  }
+
+  // 엔터키 입력 이벤트 처리
+  $('#i_mtitle').on('keypress', function (event) {
+    if (event.key === 'Enter') {
+      event.preventDefault(); // 기본 제출 방지
+      $("#diarySaveBtn").click(); // 제목 변경 버튼 클릭 트리거
+    }
+  });
+
+  $(function(){
+    $("#diarySaveBtn").click(function(){
+        var newTitle = $("#i_mtitle").val();  // 제목 값을 가져오기
+
+        // 제목이 1글자 미만일 경우 경고
+        if(newTitle.length < 1){
+            alert("제목은 1글자 이상 입력해주세요.");
+            return false;
+        }
+
+        // 다이어리 제목을 변경할 것인지 확인
+        if(confirm("내 다이어리 제목을 변경하시겠어요?")){
+            // AJAX 요청을 사용하여 비동기적으로 데이터 전송
+            $.ajax({
+                url: '/diary/titleChg/',  // 서버로 보낼 URL
+                headers: {
+                  'X-CSRFToken': $('meta[name="csrf-token"]').attr('content')  // CSRF 토큰 추가
+              },
+                type: 'POST',
+                data: {
+                    mtitle: newTitle,  // 제목 데이터
+                    csrfmiddlewaretoken: $('meta[name="csrf-token"]').attr('content')  // CSRF 토큰 추가
+                },
+                success: function(response){
+                    // 성공 시 다이어리 목록으로 리다이렉트
+                    window.location.href = '/diary/MdiaryList/';
+                },
+                error: function(xhr, status, error){
+                    // 오류가 발생하면 메시지 출력
+                    alert("다이어리 제목 수정에 실패했습니다. 다시 시도해주세요.");
+                }
+            });
+        }
+    });
+
+  // 다이어리 제목 수정취소
+  $(function(){
+    $("#cancleBtn").click(function(){
+      if(confirm("제목 수정을 취소하시겠어요?")){
+        location.href = "/diary/MdiaryList/";
+      }else{
+        return false;
+      }
+    });
+  });
+
+});
+      
+      
+  // 첫 번째 모달 열기
+  document.getElementById('openModal_1').addEventListener('click', function() {
+    var modal = document.getElementById('sub_menu_modal_1');
+    console.log('첫 번째 모달 클릭됨');
+    modal.classList.toggle('open'); // open 클래스가 있으면 제거, 없으면 추가
+
+    // 모달이 열렸을 때 삭제 버튼 이벤트 리스너 추가
+    if (modal.classList.contains('open')) {
+      console.log('모달이 열렸습니다.');
+      var deleteBtn = document.getElementById('diaryDeleteBtn');
+  }
+  });
+
+  
+  // 첫 번째 모달 닫기
+  document.getElementById('back_click').addEventListener('click', function() {
+    console.log('목록 클릭됨');
+    location.href='/customer/noticelist/'
+  });
+</script>
+
+</body>
+</html>

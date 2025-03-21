@@ -1,0 +1,92 @@
+* {
+	margin: 0;
+	padding: 0;
+	font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
+}
+a {
+	text-decoration: none;
+	color: inherit;
+	cursor: pointer;
+}
+ol, ul {
+	list-style: none;
+}
+.gnb {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	height: 60px;
+	background-color: #ffffff;
+	padding: 0 20px;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.gnb .logo {
+	font-size: 20px;
+	font-weight: bold;
+	color: #333;
+	text-decoration: none;
+}
+.gnb .menu {
+	display: flex;
+	gap: 20px;
+}
+.gnb .menu a {
+	text-decoration: none;
+	color: #333;
+	font-size: 16px;
+	padding: 5px 10px;
+	border-radius: 4px;
+	transition: background-color 0.3s, color 0.3s;
+}
+.gnb .menu a:hover, .gnb .menu a.active {
+	background-color: #f0f0f0;
+	color: #007bff;
+}
+
+
+.login_wrap{
+	width: 400px;
+	margin: 100px auto;
+	border: 1px solid #d9d9d9;
+	border-radius: 20px;
+	padding: 40px;
+	box-sizing: border-box;
+}
+.login_wrap h2{
+	text-align: center;
+	margin-bottom: 30px;
+}
+
+.login_wrap input{
+	width: 200px;
+	height: 26px;
+	padding: 0 4px;
+}
+.login_wrap input:focus{
+	border-color: #007bff;
+	outline: none;
+}
+
+.id_wrap, .pw_wrap{
+	width: 320px;
+	margin-bottom: 6px;
+}
+
+.id_wrap label{
+	margin-right: 23px;
+}
+.pw_wrap label{
+	margin-right: 10px;
+}
+
+.saveid_wrap input{
+	width: 16px;
+	height:16px;
+	margin-top: 8px;
+}
+
+.login_btn{
+	width: 320px;
+	height: 34px;
+	margin-top: 14px;
+}

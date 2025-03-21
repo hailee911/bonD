@@ -1,0 +1,152 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="{% static 'css/admin1/admin_login.css'%}">
+<link rel="stylesheet" href="{% static 'css/admin1/admin_memllist.css'%}">
+<script  src="http://code.jquery.com/jquery-latest.min.js"></script>
+<title>회원관리</title>
+<script>
+	if ('{{outMsg}}' == '1'){
+		alert("안전하게 로그아웃되었습니다.")
+		location.href = '/admin1/login/'
+		
+	};
+
+	if ('{{amsg}}' != ''){
+		alert("{{amsg}} 님이 회원으로 등록되었습니다.")
+		location.href = '/admin1/admin_memList/'
+	};
+	$(function(){
+		$("#a_logout").click(function(){
+			if(confirm("로그아웃 하시겠습니까?")){
+				location.href='/admin1/logout/'
+			}
+		})
+
+		$("#addBtn").click(function(){
+			location.href = '/admin1/admin_memAdd/'
+		})
+
+
+		$('#dBtn').click(function () {
+			// 선택된 체크박스의 데이터를 배열로 저장
+			const selectedMembers = [];
+			document.querySelectorAll('.select_member:checked').forEach((checkbox) => {
+					const memberId = checkbox.closest('tr').querySelector('td:nth-child(2)').textContent.trim(); // 아이디 추출
+					selectedMembers.push(memberId);
+			});
+
+			// 선택된 멤버가 없을 경우 알림
+			if (selectedMembers.length === 0) {
+					alert("삭제할 회원을 선택해주세요.");
+					return;
+			}
+
+			// 확인 창
+			if (!confirm("선택된 회원을 삭제하시겠습니까?")) {
+					return;
+			}
+
+			// AJAX로 데이터 전송
+			$.ajax({
+					url: '/admin1/admin_memsDelete/', // 삭제 요청을 처리할 URL
+					method: 'POST',
+					data: JSON.stringify({ members: selectedMembers }),
+					contentType: 'application/json',
+					headers: {
+							'X-CSRFToken': '{{ csrf_token }}',
+					},
+					success: function (response) {
+							alert("선택된 회원이 삭제되었습니다.");
+							location.reload(); // 페이지 새로고침
+					},
+					error: function (error) {
+							alert("회원 삭제 중 오류가 발생했습니다. 다시 시도해주세요.");
+							console.error(error);
+					},
+			});
+		});
+	})
+</script>
+</head>
+<body>
+	<nav class="gnb">
+		<a href="#" class="logo"><img src="/static/images/admin1/logo_sample.png" alt=""></a>
+		<div class="menu">
+				<a class="active" href="/admin1/admin_memList/">회원관리</a>
+				<a href="#">판매관리</a>
+				<a href="/admin1/admin_noticeList/">공지사항</a>
+				<a href="/admin1/admin_postList/">포스트</a>
+				<a href="/admin1/admin_qList/" >1:1문의</a>
+				<a href="/admin1/admin_adminList/">관리자설정</a>
+				<a id='a_logout'>로그아웃</a>
+		</div>
+	</nav>
+	<div class="container">
+		<div class="con_header">
+			<h2>회원 관리</h2>
+			<button id="addBtn" type="button">회원 추가</button>
+			<button id="dBtn" type="button">회원 삭제</button>
+		</div>
+		<table>
+			<thead>
+				<tr>
+					<th><input type="checkbox" id="select_all"></th>
+					<th>아이디</th>
+					<th>회원이름</th>
+					<th>닉네임</th>
+					<th>이메일</th>
+					<th>가입일</th>
+					<th>구독상태</th>
+				</tr>
+			</thead>
+			<tbody>
+				<!-- 데이터 추가 반복 -->
+				{% for mem in mlist %}
+				<tr>
+					<td><input type="checkbox" class="select_member"></td>
+					<td>{{mem.id}}</td>
+					<td class="member_name"><a href="/admin1/admin_memView/{{mem.id}}/">{{mem.name}}</a></td>
+					<td>{{mem.nicName}}</td>
+					<td>{{mem.mail}}</td>
+					<td>{{mem.mdate}}</td>
+					<td>구독중</td>
+				</tr>
+				{% endfor %}
+				<!-- 데이터 추가 반복 -->
+				
+			</tbody>
+		</table>
+	</div>
+	<script>
+	$(function(){
+		const currentPage = window.location.pathname;
+		$('.menu-item').each(function () {
+			if ($(this).attr('href') === currentPage) {
+				$(this).addClass('active');
+			}
+		});
+	});
+	
+	// 전체 선택 기능
+	const selectAllCheckbox = document.getElementById('select_all');
+	const memberCheckboxes = document.querySelectorAll('.select_member');
+	
+	selectAllCheckbox.addEventListener('change', function () {
+			memberCheckboxes.forEach(checkbox => {
+					checkbox.checked = selectAllCheckbox.checked;
+			});
+	});
+
+	// 멤버 추가 버튼 클릭
+	document.getElementById('cBtn').addEventListener('click', function() {
+		location.href = '/admin1/admin_memAdd/';
+	});
+
+	</script>
+
+</body>
+</html>

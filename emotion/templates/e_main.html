@@ -1,0 +1,148 @@
+{% extends 'main_navi_base.html' %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
+  <script src="https://code.jquery.com/jquery-latest.min.js"></script>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <title>내 감정 돌아보기</title>
+</head>
+<body>
+  <!-- 프로필 -->
+  {% block profill-block%}
+  <div id="user_profile">
+    <div id="pimg">
+      <img src="{{ my_img.img.url }}" alt="">
+    </div>
+    <p id="uName" >{{mem_info.name}}</p>
+    <p id="uEmail">{{mem_info.mail}}</p>
+  </div>
+
+  	<!-- Nav -->
+		<nav id="menu">
+			<ul>
+				<a href="/main/index/"><li class="menu_item">우리 가족 이야기</li></a>
+				<a href="/diary/diaryHome/"><li class="menu_item">다이어리</li></a>
+				<a href="/emotion/main/"><li class="menu_item active">감정 돌아보기</li></a>
+				<a href="/family1/fam/"><li class="menu_item">우리가족</li></a>
+				<a href="/calendar1/cal/"><li class="menu_item">캘린더</li></a>
+				<a href="/customer/"><li class="menu_item">알려드려요</li></a>
+			</ul>
+		</nav>
+
+  {% endblock profill-block%}
+  
+  {% block container-block%}
+  <div id="container">
+    <div id="emotion_top">
+      <h2>내 감정 돌아보기</h2>
+    </div>
+    <div id="emotion_main_top">
+      <p>{{name}} 님의 기록을 바탕으로 AI가 분석한 감정 점수에요.</p>
+      <div class="emotion_main_graph">
+        <div class="emotion_graph_m">
+          <div class="graph_r_title">
+            <span>{{year}}년 {{month}}월</span>
+          </div>
+          <div class='emotion_graph_mm'></div>
+        </div>
+        <div class="emotion_graph_w">
+          <div class="graph_r_title">
+            <span>{{month}}월 {{week}}째주</span>
+          </div>
+          <div class='emotion_graph_ww'></div>
+        </div>
+        <div class="emotion_graph_r">
+          <div class="graph_r_title">
+            <span>AI 분석</span><img src="/static/images/emotion/q.png" alt="">
+          </div>
+          <div class="graph_r_content">
+            <ul class="emoji">
+              {% if highest_score == 0 %}
+              <li><img src="/static/images/emotion/good.png" alt=""></li>
+              {% else %}
+                <li><img src="/static/images/emotion/good.png" alt=""></li>
+                {% if lowest_score == 0 %}
+                <li><img src="/static/images/emotion/good.png" alt=""></li>
+                {% else %}
+                <li><img src="/static/images/emotion/bad.png" alt=""></li>
+                {% endif %}
+                {% if emotion_text == '크네요.' %}
+                <li><img src="/static/images/emotion/bad.png" alt=""></li>
+                {% else %}
+                <li><img src="/static/images/emotion/good.png" alt=""></li>
+                {% endif %}
+              {% endif %}
+            </ul>
+            <ul class="comment">
+              {% if highest_score == 0 %}
+              <li>{{name}}님 이번주 일기를 작성하고 감정 분석을 해보세요!</li>
+              {% else %}
+                <li>{{name}}님은 이번 주 {{highest_score_weekday}}요일이 가장 점수가 높았어요.</li>
+                {% if lowest_score == 0 %}
+                <li>{{name}}님, 내일도 일기 쓰러 와주실거죠?</li>
+                {% else %}
+                <li>{{name}}님은 이번 주 {{lowest_score_weekday}}요일이 가장 점수가 낮았어요.</li>
+                {% endif %}
+                {% if emotion_text != None %}
+                <li>{{name}}님은 주 단위 감정 점수의 기복이 {{emotion_text}}</li>
+                {% endif %}
+              {% endif %}
+            </ul>
+          </div>
+          <button type="button"><a href="/emotion/report/">자세히 보기 -></a></button>
+        </div>
+      </div>
+    </div>
+    <div id="emotion_main_bottom">
+      <div id="emotion_main_bottom_left">
+        <span>{{name}}님을 가장 잘 알것 같은 가족은?</span>
+        <div class="emotion_main_graph">
+          <div class="family_graph_r">
+            <div class="graph_r_title">
+              <span>댓글 랭킹</span>
+            </div>
+            {% if commenter_counts == None %}
+            <div class='nonecomm'> 댓글이 없습니다. </div>
+            {% else %}
+            <div class='family_graph_rr'></div>
+            <div class='family_graph_rrr'></div>
+            {% endif %}
+          </div>
+          <div class="family_graph_l">
+            <div class="graph_r_title">
+              <span>좋아요 랭킹</span>
+            </div>
+            {% if likes_counts == None %}
+              <div class='nonelike'> 좋아요가 없습니다. </div>
+            {% else %}
+              <div class='family_graph_ll'></div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      <div id="emotion_main_bottom_right">
+        <span>{{name}}님은 다이어리를 얼마나 썼을까요?</span>
+        <div class="emotion_main_graph">
+          <div class="personal_graph">
+            <div class="graph_r_title">
+              <span>최근 4개월</span>
+            </div>
+            <div class='personal_graphh'></div>
+          </div>
+          <div class="personal_graph_r">
+            <p style='font-size: 20px; font-weight: bold;'>{{name}}님은 최근 4개월 동안</p><br/>
+            <div><p style="color: #344BFD; font-size: 20px; font-weight: bold;">총 {{total_value}}번의 일상을 기록</p><p style="font-size: 20px;">했고</p></div>
+            <div><p style="color: #F68D2B; font-size: 20px; font-weight: bold; letter-spacing: -1.5px;">그 중 {{total_value2}}번의 일상을 가족과 공유</p><p style="font-size: 20px;">했어요.</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="{% static 'js/emotion/emotion.js'%}"></script>
+  {% endblock container-block%}
+</body>
+</html>

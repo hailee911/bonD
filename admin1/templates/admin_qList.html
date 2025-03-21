@@ -1,0 +1,240 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link rel="stylesheet" href="{% static 'css/admin1/admin_memllist.css'%}">
+		<link rel="stylesheet" href="{% static 'css/admin1/admin_login.css'%}">
+		<script  src="http://code.jquery.com/jquery-latest.min.js"></script>
+		<title>1:1문의</title>
+		<script>
+			if('{{request.session.session_role}}'=='1'){
+				alert("접근 권한이 없습니다.")
+				location.href = '/admin1/admin_memList/'
+			}
+			
+			$(function(){
+				$("#a_logout").click(function(){
+					if(confirm("로그아웃 하시겠습니까?")){
+						location.href='/admin1/logout/'
+					}
+				})
+			
+			});
+			// 답변 완료 처리 ~~~~~~~~~~~~~~
+			// 체크박스 체크 삭제
+			$(document).ready(function() {
+				$('#reokBtn').click(function() {
+					// 선택된 체크박스의 데이터를 배열로 저장
+					const selectedMembers = [];
+					document.querySelectorAll('.select_member:checked').forEach((checkbox) => {
+						const href = checkbox.closest('tr').querySelector('.member_name a').getAttribute('href'); // href 추출
+						const bno = href.split('/').filter(Boolean).pop(); // URL에서 bno 추출
+						selectedMembers.push(bno);
+					});
+					
+					// 선택된 글 없을 경우 알림
+					if (selectedMembers.length === 0) {
+						alert("답변이 완료된 문의를 선택해주세요.");
+						return;
+					}
+					
+					// 확인 창
+					if (!confirm("선택된 문의를 답변 완료 처리하시겠습니까?")) {
+						return;
+					}
+
+					// AJAX로 데이터 전송
+					$.ajax({
+						url: '/admin1/admin_qList/chgText/', // 삭제 요청을 처리할 URL
+						method: 'POST',
+						data: JSON.stringify({ members: selectedMembers }),
+						contentType: 'application/json',
+						headers: {
+								'X-CSRFToken': '{{ csrf_token }}',
+							},
+							success: function(response) {
+								alert("선택된 문의가 답변 완료 처리되었습니다.");
+								location.reload(); // 페이지 새로고침
+							},
+							error: function(error) {
+								alert("답변 상태 처리 중 오류가 발생했습니다. 다시 시도해주세요.");
+								console.error(error);
+						},
+					});
+				});
+			});
+
+			// 답변 취소 처리 ~~~~~~~~~~~~~~
+			// 체크박스 체크 삭제
+			$(document).ready(function() {
+				$('#cancelBtn').click(function() {
+					// 선택된 체크박스의 데이터를 배열로 저장
+					const selectedMembers = [];
+					document.querySelectorAll('.select_member:checked').forEach((checkbox) => {
+						const href = checkbox.closest('tr').querySelector('.member_name a').getAttribute('href'); // href 추출
+						const bno = href.split('/').filter(Boolean).pop(); // URL에서 bno 추출
+						selectedMembers.push(bno);
+					});
+					
+					// 선택된 글 없을 경우 알림
+					if (selectedMembers.length === 0) {
+						alert("답변 취소할 문의를 선택해주세요.");
+						return;
+					}
+					
+					// 확인 창
+					if (!confirm("선택된 문의를 답변 취소 처리하시겠습니까?")) {
+						return;
+					}
+
+					// AJAX로 데이터 전송
+					$.ajax({
+						url: '/admin1/admin_qList/chgText2/', // 삭제 요청을 처리할 URL
+						method: 'POST',
+						data: JSON.stringify({ members: selectedMembers }),
+						contentType: 'application/json',
+						headers: {
+								'X-CSRFToken': '{{ csrf_token }}',
+							},
+							success: function(response) {
+								alert("선택된 문의가 답변 취소 처리되었습니다.");
+								location.reload(); // 페이지 새로고침
+							},
+							error: function(error) {
+								alert("답변 상태 처리 중 오류가 발생했습니다. 다시 시도해주세요.");
+								console.error(error);
+						},
+					});
+				});
+			});
+			// 전체 선택 기능
+			const selectAllCheckbox = document.getElementById('select_all');
+			const memberCheckboxes = document.querySelectorAll('.select_member');
+			
+			selectAllCheckbox.addEventListener('change', function () {
+					memberCheckboxes.forEach(checkbox => {
+							checkbox.checked = selectAllCheckbox.checked;
+					});
+			});
+
+
+		</script>
+	</head>
+	<body>
+	<nav class="gnb">
+		<a href="#" class="logo"><img src="/static/images/admin1/logo_sample.png" alt=""></a>
+		<div class="menu">
+			<a href="/admin1/admin_memList/">회원관리</a>
+			<a href="#">판매관리</a>
+			<a href="/admin1/admin_noticeList/">공지사항</a>
+			<a href="/admin1/admin_postList/" >포스트</a>
+			<a href="/admin1/admin_qList/" class='active'>1:1문의</a>
+			<a href="/admin1/admin_adminList/">관리자설정</a>
+			<a id='a_logout'>로그아웃</a>
+		</div>
+	</nav>
+	<div class="container">
+		<div class="con_header">
+			<h2>1:1문의</h2>
+			<button id="reokBtn" type="button">답변 완료</button>
+		</div>
+		<table>
+			<colgroup>
+        <col style="width: 5%;"> <!-- 체크박스 열 -->
+        <col style="width: 5%;"> <!-- 번호 열 -->
+        <col style="width: 10%;"> <!-- 작성자 열 -->
+        <col style="width: 15%;"> <!-- 문의종류 열 -->
+        <col style="width: 30%;"> <!-- 문의내용 열 -->
+        <col style="width: 10%;"> <!-- 첨부파일 열 -->
+        <col style="width: 10%;"> <!-- 이메일 열 -->
+        <col style="width: 10%;"> <!-- 날짜 열 -->
+        <col style="width: 10%;"> <!-- 답변 상태 열 -->
+    	</colgroup>
+			<thead>
+				<tr>
+					<th><input type="checkbox" id="select_all"></th>
+					<th>번호</th>
+					<th>작성자</th>
+					<th>문의종류</th>
+					<th>내용</th>
+					<th>첨부파일</th>
+					<th>이메일</th>
+					<th>날짜</th>
+					<th>답변상태</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for q in nolist %}
+				<tr>
+					<td><input type="checkbox" class="select_member"></td>
+					<td>{{forloop.revcounter}}</td> 
+					<td >{{q.userid}}</td>
+					<td class="member_name"><a href="/admin1/admin_qList/{{q.bno}}/">{{q.btitle}}</a></td>
+					<td>{{q.bcontent}}</td>
+					<td>{{q.bfile}}</td>
+					<td>{{q.bmail}}</td>
+					<td>{{q.bdate|date:'y-m-d H:i:s'}}</td>
+					<td id='chgText'>{{q.status}}</td>
+				</tr>
+				{% empty %}
+    		<tr>
+       	 <td colspan="8" style="text-align: center;">등록된 문의가 없습니다.</td>
+    		</tr>
+				{% endfor %}
+				<!-- 데이터 추가 반복 -->
+			</tbody>
+		</table>
+		<h2>답변완료</h2>
+		<button id="cancelBtn" type="button">답변 완료 취소</button>
+		<table>
+			<colgroup>
+        <col style="width: 5%;"> <!-- 체크박스 열 -->
+        <col style="width: 5%;"> <!-- 번호 열 -->
+        <col style="width: 10%;"> <!-- 작성자 열 -->
+        <col style="width: 15%;"> <!-- 문의종류 열 -->
+        <col style="width: 30%;"> <!-- 문의내용 열 -->
+        <col style="width: 10%;"> <!-- 첨부파일 열 -->
+        <col style="width: 10%;"> <!-- 이메일 열 -->
+        <col style="width: 10%;"> <!-- 날짜 열 -->
+        <col style="width: 10%;"> <!-- 답변 상태 열 -->
+    	</colgroup>
+			<thead>
+				<tr>
+					<th><input type="checkbox" id="select_all"></th>
+					<th>번호</th>
+					<th>작성자</th>
+					<th>문의종류</th>
+					<th>내용</th>
+					<th>첨부파일</th>
+					<th>이메일</th>
+					<th>날짜</th>
+					<th>답변상태</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for q in oklist %}
+				<tr>
+					<td><input type="checkbox" class="select_member"></td>
+					<td>{{forloop.revcounter}}</td> 
+					<td >{{q.userid}}</td>
+					<td class="member_name"><a href="/admin1/admin_qList/{{q.bno}}/">{{q.btitle}}</a></td>
+					<td>{{q.bcontent}}</td>
+					<td>{{q.bfile}}</td>
+					<td>{{q.bmail}}</td>
+					<td>{{q.bdate|date:'y-m-d H:i:s'}}</td>
+					<td id='chgText'>{{q.status}}</td>
+				</tr>
+				{% empty %}
+    		<tr>
+					<td colspan="9" style="text-align: center;">완료된 답변이 없습니다.</td>
+    		</tr>
+				{% endfor %}
+				<!-- 데이터 추가 반복 -->
+			</tbody>
+		</table>
+	</div>
+
+</body>
+</html>

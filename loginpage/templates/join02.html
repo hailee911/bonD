@@ -1,0 +1,79 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
+  <link rel="stylesheet" type="text/css" href="{% static '/css/login/join1.css'%}">
+  <title>회원가입 페이지</title>
+  <script>
+    const eyeClosedImage = "{% static '/images/login/eye_closed.png' %}";
+    const eyeOpenImage = "{% static '/images/login/eye_open.png' %}";
+  </script>
+  
+</head>
+<body>
+    <div class="container">
+        <div class="image-section">
+            <img src="{% static '/images/login/join_login_index.svg'%}" alt="">
+            </svg>
+        </div>
+        <div class="join_form">
+            <h2>계정 정보 입력</h2>
+            <span>사용하실 계정 정보를 입력해주세요.</span>
+
+            <form action="" method="POST" name="join02Frm" class="join_info">
+                {% csrf_token %}
+
+                <div class="join2_span1">
+                    <label for="id">아이디*</label>
+                    <div class="join2_error-message" id="join2_errorMessage1">아이디를 입력해주세요.</div>
+                </div>
+                {% if messages %}
+                {% for message in messages %}
+                    <div id="overlap_id">{{ message }}</div>
+                {% endfor %}
+                {% endif %}
+                <input type="text" id="id" class='join2_input' name='id' placeholder="아이디를 입력해주세요.">
+                <div class="join2_span1">
+                    <label for="password">비밀번호*</label>
+                    <div class="join2_error-message" id="join2_errorMessage1">비밀번호를 입력해주세요.</div>
+                </div>
+                <div class="join02_password">
+                    <input type="password" id="join02_password" class='join2_input' name="pw" placeholder="비밀번호는 8자리 이상 영어, 숫자, 특수기호 포함해주세요.">
+                    <button type="button" class="toggleButton">
+                        <img src="{% static '/images/login/eye_closed.png'%}" alt="비밀번호 보기">
+                    </button>
+                </div>
+                <div class="join2_span1">
+                    <label for="password">비밀번호 확인*</label>
+                    <div class="join2_error-message" id="join2_errorMessage1">비밀번호를 입력해주세요.</div>
+                </div>
+                <div class="join02_password">
+                    <input type="password" id="join02_password2" class='join2_input' placeholder="비밀번호를 다시 입력해주세요.">
+                    <button type="button" class="toggleButton">
+                        <img src="{% static '/images/login/eye_closed.png'%}" alt="비밀번호 보기">
+                    </button>
+                </div>
+                <div class="join2_span1">
+                    <label for="email">이메일*</label>
+                    <div class="join2_error-message" id="join2_errorMessage1">이메일 입력해주세요.</div>
+                </div>
+                <div class="email">
+                    <input type="text" id="email1" class='join2_input' name="em1" placeholder="이메일">
+                    <select class="email2" name="em2" id='email2'>
+                        <option value="naver.com">naver.com</option>
+                        <option value="gmail.com">gmail.com</option>
+                        <option value="hanmail.net">hanmail.net</option>
+                        <option value="nate.com">nate.com</option>
+                        <option value="daum.net">daum.net</option>
+                    </select>
+                </div>
+                <button type="button" id="join2_button" >다음</button>
+            </form>
+            <script src="{% static '/js/login/join02.js'%}"></script>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,31 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
+  <link rel="stylesheet" type="text/css" href="{% static '/css/login/join1.css'%}">
+  <title>회원가입 페이지</title>
+  
+</head>
+<body>
+    <div class="container">
+        <div class="image-section">
+            <img src="{% static '/images/login/join_login_index.svg'%}" alt="">
+            </svg>
+        </div>
+        <div class="join_form">
+            <h2>환영합니다.</h2>
+            <span>
+                회원가입이 완료되었어요.<br>
+                가족들과 함께 소중한 추억의 한 페이지를 엮어보세요.
+            </span>
+            <a href="/loginpage/login/">
+            <button type="button">로그인 하러 가기</button>
+            </a>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

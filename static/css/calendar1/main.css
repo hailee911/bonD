@@ -1,0 +1,523 @@
+* {
+	margin: 0;
+	padding: 0;
+	font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
+}
+button{
+	cursor: pointer;
+}
+a {
+	text-decoration: none;
+	color: inherit;
+	cursor: pointer;
+}
+ol, ul {
+	list-style: none;
+}
+
+#top_nav {
+	width: 100%;
+	height: 60px;
+	background: #fff;
+	border-bottom: 1px solid #E9E9E9;
+	position: fixed;
+	z-index: 2;
+}
+
+#gnb {
+	width: 284px;
+	height: 100%;
+	overflow-y: auto;
+	position: fixed;
+	top : 60px;
+	border-right: 1px solid #E9E9E9;
+	background: #fff;
+	z-index:2;
+}
+
+#user_profile {
+	width: 284px;
+	height: 264px;
+	/* border: 1px solid black; */
+	text-align: center;
+}
+
+#uName{font-size: 18px; font-weight: 500; letter-spacing: 3px; line-height: 21px; margin-top:23px}
+#uEmail{font-size: 14px; font-weight: 400; line-height: 17px; color: #797979; margin-top:9px}
+
+#pimg {
+	width: 100px;
+	height: 100px;
+	/* border: 1px solid black; */
+	border-radius: 100%;
+	overflow: hidden;
+	margin: 40px auto 0;
+}
+
+#pimg img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover; /* 이미지 비율 유지하며 영역 채우기 */
+}
+
+#menu{
+	z-index:2;
+}
+
+#menu ul {
+	list-style: none;
+	padding-left: 0;
+	margin-bottom: 220px;
+}
+
+#menu ul li {
+	height: 44px;
+	padding: 11px 0 11px 40px;
+	margin-bottom: 5px;
+	box-sizing: border-box;
+	transition: background-color 0.3s, color 0.3s;
+}
+
+.menu_item {
+	font-size: 16px;
+	font-weight: 400;
+	color: #666;
+}
+
+.menu_item.active {
+	font-size: 16px;
+	font-weight: 600;
+	color: #000;
+	background-color: #FAFAFA;
+	background-image: url(../../images/calendar1/menu_bar.png);
+	background-repeat: no-repeat;
+	background-position: right center;
+	
+}
+
+.menu_item:hover {
+	background-color: #FAFAFA;
+	color: #000;
+}
+
+#logout{
+	font-size: 16px;
+	font-weight: 600;
+	margin-left: 40px;
+	background-image: url(../../images/calendar1/logout_icon.png);
+	background-repeat: no-repeat;
+	background-position: left center;
+}
+#logout span{margin-left: 34px;}
+
+
+
+
+#top_nav>h1{ width: 81px; height: 24px; 
+background: url('../../images/calendar1/logo_sample.png') no-repeat;
+position: absolute; 
+left:50px; top:18px; 
+}
+
+.top_menu{
+display: flex;
+gap: 24px;
+justify-content: flex-end;
+margin-right: 48px;
+padding-top: 20px;
+box-sizing: border-box;
+}
+
+
+/* 검색창 슬라이드 */
+.search_bar {
+  position: fixed;
+  top: 0;
+  top: -950px;
+  width: 100%;
+  height: 600px;
+  margin-top: 60px;
+  box-sizing: border-box;
+  background-color: white;
+  box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+  overflow-x: auto;
+  transition: top 0.3s ease-in-out;
+  z-index: 1000;
+}
+.search_bar.closed {
+  top: -950px;
+}
+.search_bar.open {
+  top: 0;
+}
+#input_wrap{
+  display: flex;
+}
+#searchFrm{
+  margin: 0 auto;
+  display: flex;
+}
+.search_box {
+  display: flex;
+  align-items: center;
+  border: 1px solid #ccc;
+  border-radius: 50px;
+  padding: 5px 14px;
+  width: 600px;
+  height: 48px;
+  margin: 40px auto 20px;
+  box-sizing: border-box;
+  background-color: #F9F9F9;
+}
+.search_box input[type="text"] {
+  border: none;
+  outline: none;
+  flex-grow: 1;
+  font-size: 15px;
+  background: transparent;
+}
+
+#search_closeBtn  {
+  border: none;
+  background: #fff;
+  width: 24px;
+  height: 24px;
+  position: relative;
+  top: 52px;
+  left: -50px;
+  cursor: pointer;
+}
+.search_box input::placeholder {
+  color: #aaa;
+}
+#search_content{
+  width: 1000px;
+  margin: 0 auto 60px;
+  /* border: 1px solid black; */
+}
+#search_result{
+  padding: 20px;
+  box-sizing: border-box;
+  height: 64px;
+  font-size: 20px;
+  font-weight: 400;
+  border-bottom: 1px solid #DFDFDF;
+}
+.search_list{
+  width: 100%;
+  height: 60px;
+  border-bottom: 1px solid #DFDFDF;
+  font-size: 17px;
+  padding: 20px;
+  box-sizing: border-box;
+}
+.search_list a{
+  display: flex;
+  align-items: center;
+}
+.s_title{
+  margin-right: 24px;
+}
+.s_date{
+  color: #797979;
+}
+.search_list img{
+  margin-left: auto;
+}
+/* 페이지 어둡게 */
+.s_overlay {
+  position: fixed;
+  top: 61px;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 998;
+  display: none;
+}
+.s_overlay.show {
+  display: block;
+  animation: fadeIn 0.8s ease-in-out;
+}
+
+
+/* 알림창 슬라이드 */
+
+.noti_list.read {
+  background-color: white; /* 배경색을 흰색으로 변경 */
+}
+
+#notiBtn {
+  position: relative; /* 빨간점을 버튼 위에 올리기 위해 position 설정 */
+}
+
+.notification-dot {
+  position: absolute;
+  top: -8px;
+  right: -4px;
+  width: 8px;
+  height: 8px;
+  background-color: red;
+  border-radius: 50%;
+  display: none; /* 기본적으로 숨김 */
+}
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  right: -480px;
+  width: 480px;
+  height: 100%;
+  background-color: white;
+  box-shadow: -2px 0 5px rgba(0, 0, 0, 0.2);
+  overflow-y: auto;
+  transition: right 0.3s ease-in-out;
+  z-index: 1000;
+}
+.sidebar.closed {
+  right: -480px;
+}
+.sidebar.open {
+  right: 0;
+}
+.noti_header{
+  width: 480px;
+  height: 70px;
+  border-bottom: 1px solid #D9D9D9;
+  padding-top: 23px;
+  padding-left: 40px;
+  box-sizing: border-box;
+  display: flex;
+}
+.noti_header h2{
+  font-size: 20px;
+  font-weight: 400;
+}
+#noti_closeBtn{
+  width: 24px;
+  height: 24px;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  margin-left: 340px;
+}
+#noti_list li{
+  font-size: 17px;
+  height: 84px;
+  background: #F1F1F1;
+  background-image: url('../../images/home/n_icon.png');
+  background-repeat: no-repeat;
+  background-position: 82px 10px;
+  border-bottom: 1px solid #ececec;
+  padding-top: 22px;
+  padding-left: 30px;
+  box-sizing: border-box;
+  display: flex;
+}
+#noti_list li.checked{
+  font-size: 18px;
+  height: 84px;
+  background: #FFFFFF;
+  border-bottom: 1px solid #DFDFDF;
+  padding-top: 22px;
+  padding-left: 30px;
+  box-sizing: border-box;
+  display: flex;
+}
+#noti_list li a{
+  display: flex;
+}
+#noti_list li p{
+  padding-top: 0px;
+  padding-left: 14px;
+}
+#noti_list li .noti_date{
+  font-size: 14px;
+  color: #666;
+  padding-top: 3px;
+  padding-left: 14px;
+}
+#noti_list img{
+  width: 40px;
+  height: 40px;
+  border-radius: 100%;
+}
+.n_overlay {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 998;
+  display: none;
+}
+.n_overlay.show {
+  display: block;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+
+
+/* ----- container ----- */
+
+
+#calendar {
+	width: 1400px;
+	height: 1100px;
+	position: relative;
+	top: 150px;
+	left: 390px;
+	z-index: 1;
+	margin-bottom: 100px; 
+}
+
+#calendar_title>h1 {
+	position: relative;
+	top: 100px;
+	left: 334px;
+	font-size: 22px;
+	font-weight: 400;
+	line-height: 150%;
+}
+
+#openModalBtn{
+	position: relative;
+	top: 194px;
+	left :1625px;
+	width: 40px;
+	height: 40px;
+	background: url('../../images/calendar1/Add_round_light.png') no-repeat;
+	background-size: cover;
+	background-position: center;
+	border: none;
+	cursor: pointer;
+	z-index: 10;
+}
+
+
+/* 모달을 위한 스타일 */
+.modal {
+	display: none; /* 기본적으로 숨김 */
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0, 0, 0, 0.5); /* 배경을 반투명 검은색으로 */
+	justify-content: center;
+	align-items: center;
+	z-index:2;
+}
+
+.modal-content {
+	background-color: white;
+	padding: 10px 20px;
+	border-radius: 8px;
+	text-align: left;
+	width: 300px;
+	box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+.modal_head {
+	width: 100%;
+	height: 40px;
+	display: flex;
+	justify-content: space-between; /* 버튼을 양쪽 끝으로 배치 */
+	align-items: center; /* 세로 중앙 정렬 */
+	box-sizing: border-box; /* 패딩 포함 박스 모델 */
+}
+
+.modal-content h2 {
+	position: absolute; /* 절대 위치 지정 */
+	left: 50%; /* 수평 가운데 정렬 */
+	transform: translateX(-50%); /* 가운데 정렬을 위한 이동 */
+	margin: 0; /* 기본 여백 제거 */
+	text-align: center;
+}
+
+
+.Modal_input{
+	width: 100%;
+	margin: 10px 0 10px 0;
+}
+
+.closemodalBtn {
+	width: 30px;
+	height: 30px;
+	display: inline-block;
+	background-color: #fff;
+	border: none;
+	background-image: url("../../images/calendar1/Close_round_light.png");
+	background-size: cover;
+	background-position: center;
+	cursor: pointer;
+}
+
+#chechkModalBtn {
+	width: 30px;
+	height: 30px;
+	display: inline-block;
+	background-color: #fff;
+	border: none;
+	background-image: url("../../images/calendar1/Done_light.png");
+	background-size: cover;
+	background-position: center;
+	cursor: pointer;
+}
+
+#deleteBtn{
+	width: 100%;
+	display: flex;
+}
+
+#updateEventBtn{
+	width: 30px;
+	height: 30px;
+	margin-left: 30%;
+	display: inline-block;
+	background-color: #fff;
+	border: none;
+	background-image: url("../../images/calendar1/Edit_light.png");
+	background-size: cover;
+	background-position: center;
+	cursor: pointer;
+}
+
+#deleteEventBtn{
+	width: 30px;
+	height: 30px;
+	margin-left: 20%;
+	background-color: #fff;
+	border: none;
+	background-image: url("../../images/calendar1/Trash.png");
+	background-size: cover;
+	background-position: center;
+	cursor: pointer;
+}
+
+
+/* footer */
+#footer{
+	width: 1620px; 
+	height: 264px;
+	font-size: 15px;
+	color: #797979;
+	float: left;
+	margin-top: 151px;
+	margin-left: 284px;
+	padding: 60px 40px 40px 100px;
+	box-sizing: border-box;
+	background: #d9d9d9;
+	overflow: hidden;
+}
+#footer ul{
+	display: flex;
+	gap: 10px;
+}
+
+#f_link{
+	margin-top: 20px;
+	margin-bottom: 30px;
+}
+#f_txt ul li{
+	font-size: 14px;
+	margin-bottom: 6px;
+}
+

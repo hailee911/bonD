@@ -1,0 +1,61 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>비밀번호 찾기 페이지</title>
+  <link rel="stylesheet" href="{% static '/css/login/join1.css'%}">
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
+  <script>
+    const eyeClosedImage = "{% static '/images/login/eye_closed.png' %}";
+    const eyeOpenImage = "{% static '/images/login/eye_open.png' %}";
+  </script>
+</head>
+<body>
+  <div class="container">
+    <div class="image-section">
+      <img src="{% static '/images/login/join_login_index.svg'%}" alt="">
+      </svg>
+    </div>
+    <div class="join_form">
+      <div id="pw_f1">비밀번호 찾기</div>
+      <div id="pw3_f2">회원가입시 입력한 정보로 찾을게요</div>
+      <form method="POST" name="pw3Frm">
+        {% csrf_token %}
+        <div class="id1_span1">
+          <label for="password" id="pw_id">새 비밀번호</label>
+          <div class="error-message" id="errorMessage1">비밀번호를 입력해주세요</div>
+        </div>
+        <div class="password-container">
+          <input type='password' id="pwpw" class="pw3_id_input" name="password" placeholder="8자 이상 12자리 이하의 숫자, 영문자, 특수문자를 포함해주세요.">
+          <button type="button" class="toggleButton">
+              <img src="{% static '/images/login/eye_closed.png'%}" alt="비밀번호 보기">
+          </button>
+        </div>
+        <div id='pw3_pw2'>
+          <div class="id1_span1">
+            <label for="name" id="pw_id">새 비밀번호 확인</label>
+            <div class="error-message" id="errorMessage2">비밀번호를 입력해주세요</div>
+          </div>
+        </div>
+        <div id='pw3_'>
+          <div class="password-container">
+            <input type="password" id="pwpw2" class="pw3_id_input" name="password" placeholder="새비밀번호를 입력해주세요.">
+            <button type="button" class="toggleButton">
+              <img src="{% static '/images/login/eye_closed.png'%}" alt="비밀번호 보기">
+            </button>
+          </div>
+        </div>
+        {% if messages %}
+        {% for message in messages %}
+            <div id="id1_errorMessage">{{ message }}</div>
+        {% endfor %}
+        {% endif %}
+        <button type="button" id="validateButton">비밀번호 변경완료</button>
+      </form>
+      <script src="{% static '/js/login/pw3.js'%}"></script>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,192 @@
+#container_report {
+  width: 1635px;
+  height: 100%;
+  float: left;
+  margin-top: 110px;
+  margin-left: 324px;
+  margin-bottom: 407px;
+}
+
+#main_title {
+  width: 144px;
+  height: 33px;
+  font-size: 22px;
+  font-weight: 500;
+  line-height: 150%;
+}
+
+#sub_title {
+  width: 1485px;
+  height: 291px;
+  padding-left: 30px;
+  margin-top: 80px;
+}
+
+#sub_title>h1 {
+  width: 232px;
+  height: 45px;
+  font-size: 30px;
+  font-weight: 600;
+  line-height: 150%;
+  margin-top: 30px;
+
+}
+
+#sub_title>h3 {
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 150%;
+  margin-top: 13px;
+
+}
+
+#sub_title>h4 {
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 150%;
+  margin-top: 40px;
+}
+
+#sub_title>h5 {
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 170%;
+  margin-top: 9px;
+}
+
+#mbtitle {
+  background: #FAFAFA;
+  width: 600px;
+  padding: 15px;
+  margin-bottom: 10px;
+  border-radius: 15px;
+}
+
+#mbtitle span {
+  width: 299px;
+  height: 30px;
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 150%;
+}
+#mbtitle p {
+  margin-top: 5px;
+  font-size: 16px;
+}
+
+#report_container {
+  margin-left: 30px;
+  margin-top: 30px;
+  width: 100%;
+}
+
+#select_mbti>p {
+
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 150%;
+}
+
+.mbti {
+  width: 155px;
+  height: 43px;
+  margin-top: 12px;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 150%;
+}
+
+select {
+  padding: 8px 18px 8px 18px;
+  /* 위 8, 오른쪽 18, 아래 8, 왼쪽 18 */
+  box-sizing: border-box;
+  /* 패딩 포함 크기 조정 */
+  border-color: #D9D9D9;
+  margin-right: 16px;
+  position: relative;
+}
+
+#aiBtn {
+  width: 155px;
+  height: 43px;
+  margin-top: 10px;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 150%;
+  background-color: white;
+  border-color: #D9D9D9;
+  padding-top: 2.5px;
+  position: absolute;
+}
+
+#txtBtn {
+  width: 155px;
+  height: 43px;
+  font-size: 18px;
+  margin-top: 10px; 
+  font-weight: 400;
+  line-height: 150%;
+  background-color: white;
+  border-color: #D9D9D9;
+  padding-top: 2.5px;
+}
+
+#report_main {
+  width: 1485px;
+  height: 100%;
+  border: 1px solid #D9D9D9;
+  margin-top: 37px;
+  margin-left: 30px;
+  border-radius: 10px;
+  padding: 20px 40px;
+
+}
+
+#report_main>span {
+  width: 155px;
+  height: 34px;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 34px;
+  margin-left: 20px;
+}
+
+hr {
+  width: 1445px;
+  margin-top: 15px;
+  border-top: 1px;
+}
+
+#report_txt {
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 28px;
+  margin-top: 44px;
+  margin-left: 40px;
+}
+
+#bottom {
+  width: 539px;
+  height: 108px;
+  margin-left: 40px;
+  margin-top: 26px;
+  margin-bottom: 143px;
+}
+
+#bottom>span {
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 28px;
+  color: #444444;
+}
+
+#bottom>button {
+  width: 155px;
+  height: 43px;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 150%;
+  background-color: white;
+  border-color: #D9D9D9;
+  margin-top: 37px;
+}

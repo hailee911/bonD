@@ -1,0 +1,67 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>비밀번호 찾기 페이지</title>
+  <link rel="stylesheet" href="{% static '/css/login/join1.css'%}">
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
+</head>
+<body>
+  <div class="container">
+    <div class="image-section">
+      <img src="{% static '/images/login/join_login_index.svg'%}" alt="">
+      </svg>
+    </div>
+    <div class="join_form">
+      <div id="f1">비밀번호 찾기</div>
+      <div id="f2">회원가입시 입력한 정보로 찾을게요</div>
+      <form method="POST">
+        {% csrf_token %}
+        <div class="id1_span1">
+          <label for="mail" id="label_mail">이메일</label>
+          <div class="id1_error-message" id="id1_errorMessage3">메일을 입력해주세요.</div>
+        </div>
+        <dd>
+          <input type="text" id="id1_mail_id" class="id_input" name="email"  placeholder="    이메일" value="{{ email|default:'' }}">
+          <select id="id_select" name="em2">
+            <option value="naver.com" {% if em2 == 'naver.com' %}selected{% endif %}>naver.com</option>
+            <option value="gmail.com" {% if em2 == 'gmail.com' %}selected{% endif %}>gmail.com</option>
+            <option value="hanmail.net" {% if em2 == 'hanmail.net' %}selected{% endif %}>hanmail.net</option>
+            <option value="nate.com" {% if em2 == 'nate.com' %}selected{% endif %}>nate.com</option>
+            <option value="daum.net" {% if em2 == 'daum.net' %}selected{% endif %}>daum.net</option>
+          </select>
+        </dd>
+        <button type="submit" id="code_ok_button"><a id='code_a'>인증코드를 발송합니다.</a></button>
+      </form>
+      <form method="POST" name='idFrm'>
+        {% csrf_token %}
+        <label for="mail" id="label_code">인증코드</label>
+        <input type="text" id="input_code" name="verification_code" placeholder="    인증코드를 입력하세요.">
+        <div class="id1_span1">
+          <label for="name" id="label_name">이름</label>
+          <div class="id1_error-message" id="id1_errorMessage1">이름을 입력해주세요.</div>
+        </div>
+        <div id="id_input_id">
+          <input type="text" id="id1_id" name="name" class="id_input" placeholder="    이름을 입력해주세요." value="{{ name|default:'' }}">
+        </div>
+        <div class="id1_span1">
+          <label for="birthday" id="label_bir">생년월일</label>
+          <div class="id1_error-message" id="id1_errorMessage2">생년월일을 입력해주세요.</div>
+        </div>
+        <div id="id_input_bir">
+          <input type="text" id="id1_birthday" name="birthday" class="id_input" placeholder="    예) 1999-11-22" value="{{ birthday|default:'' }}">
+        </div>
+        {% if messages %}
+        {% for message in messages %}
+            <div id="id1_errorMessage">{{ message }}</div>
+        {% endfor %}
+        {% endif %}
+        <button type="button" id="id_button">인증 코드 확인</button>
+      </form>
+      <script src="{% static '/js/login/id.js'%}"></script>
+    </div>
+  </div>
+</body>
+</html>

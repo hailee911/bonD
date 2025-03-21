@@ -1,0 +1,43 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
+  <link rel="stylesheet" type="text/css" href="{% static '/css/login/join1.css'%}">
+  <title>회원가입 페이지</title>
+  
+</head>
+<body>
+    <div class="container">
+        <div class="image-section">
+            <img src="{% static '/images/login/join_login_index.svg'%}" alt="">
+            </svg>
+        </div>
+        <div class="join_form">
+            <h2>회원가입</h2>
+            <span>서비스를 이용하려면 약관동의가 필요해요.</span>
+            <form>
+                <div class="terms_all">
+                    <input type="checkbox" id="all_agree" value="all_agree">
+                    <label for="all_agree">전체 동의하기</label>
+                </div>
+                <hr>
+                <div class="terms">
+                    <input type="checkbox" id="agree1" class="slaveCheckbox">
+                    <label for="agree1">[필수]  우리의계정 약관</label><a href="/loginpage/join01_1/">상세보기</a><br>
+                    <input type="checkbox" id="agree2" class="slaveCheckbox" >
+                    <label for="agree2">[필수]  개인정보 수집 및 이용 동의</label><a href="/loginpage/join01_2/">상세보기</a><br>
+                    <input type="checkbox" id="agree3" class="slaveCheckbox" >
+                    <label for="agree3">[선택]  우리의 기록 광고메세지 수신</label><a href="/loginpage/join01_3/">상세보기</a><br>
+                    <input type="checkbox" id="agree4" class="slaveCheckbox" >
+                    <label for="agree4">[선택]  프로필 정보 추가 수집 동의</label><a href="/loginpage/join01_4/">상세보기</a><br>
+                </div>
+                <button type="button" id="join01button">다음</button>
+            </form>
+            <script src="{% static '/js/login/join01.js'%}"></script>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,179 @@
+/* 기본틀 */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
+}
+
+a{
+  text-decoration: none;
+  color:inherit;
+}
+
+body, html {
+  height: 100%;
+}
+
+
+table, tr, td{
+  border-collapse: collapse;
+  color: #333;
+  font-size: 14px;
+}
+
+
+/* container */
+#container{
+  width: 100%;
+  min-height: 100vh; /* 화면 높이와 동일하게 설정 */
+  padding: 100px 180px 150px 334px;
+  /* padding: 60px 300px 0 300px; */
+}
+
+#mypage_top{
+  font-size: 22px;
+}
+
+.mypage_cont_title{
+  border-bottom: 1px solid #D9D9D9;
+  width: 100%;
+  margin: 50px 0 20px 0;
+  padding-bottom: 20px;
+}
+
+.mypage_cont_title span{
+  font-size: 26px;
+  width: 100%;
+}
+
+.mypage_cont input[type="text"]{
+  display: inline-block;
+  height: 100%;
+  border: none;
+  border-bottom: 1px solid #D9D9D9;
+  font-size: 16px;
+}
+
+.mypage_cont input[type="text"]:read-only {
+  border: none;
+}
+
+.mypage_cont button{
+  display: inline-block;
+  width: 120px;
+  height: 50px;
+  border: 1px solid #D9D9D9;
+  background: white;
+  cursor: pointer;
+}
+
+.mypage_cont button{
+  display: inline-block;
+  width: 120px;
+  height: 50px;
+  border: 1px solid #D9D9D9;
+  background: white;
+  cursor: pointer;
+}
+
+.mypage_cont {
+  width: 100%;
+  margin-bottom: 50px;
+}
+
+/* .mypage_cont div {
+  flex: 1; /* 가로 공간 균등 분배 } */
+
+.mypage_cont span{
+  display: inline-block;
+  width: 70px;
+  height: 60px;
+  line-height: 60px;
+  margin: 0 25px;
+  text-align: center;
+}
+
+.mypage_cont .mypage_name{
+  display: flex;
+}
+.mypage_cont .mypage_id{
+  display: flex;
+}
+.mypage_cont .mypage_pw{
+  display: flex;
+}
+
+.mypage_pw_chg{
+  display: none; /* 처음엔 숨김*/
+  width: 700px;
+  height: 350px;
+  box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  padding: 30px;
+  margin: 10px;
+}
+
+.mypage_pw_chg span{
+  width: 120px;
+}
+
+.mypage_pw_chg div{
+  margin: 10px auto;
+}
+
+.mypage_pw_chg button{
+  margin-left: 40px;
+}
+
+.mypage_pw_chg p{
+  margin: 0 0 0 180px ;
+}
+
+.mypage_cont .mypage_nicname{
+  display: flex;
+}
+.mypage_cont .mypage_email{
+  display: flex;
+}
+
+.mypage_email p{
+  width: 50px;
+  text-align: center;
+  margin: auto 0;
+}
+
+.mypage_email2{
+  width: 160px;
+  border: 1px solid #D9D9D9;
+}
+
+.mypage_cont .mypage_gender{
+  display: flex;
+}
+
+.mypage_gender_chk{
+  margin: auto 0;
+}
+
+.mypage_gender_chk label{
+  margin: 0 30px 0 15px;
+}
+
+.mypage_cont .mypage_birth{
+  display: flex;
+}
+
+#mypage_modi_btn{
+  margin-left: 30px;
+}
+
+#mypage_modi_btn button{
+  display: inline-block;
+  width: 120px;
+  height: 50px;
+  margin-left: 15px;
+  border: 1px solid #D9D9D9;
+  background: white;
+  cursor: pointer;
+}

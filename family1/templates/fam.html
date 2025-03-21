@@ -1,0 +1,585 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" as="style" crossorigin
+    href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
+  <link rel="stylesheet" href="{% static '/css/family1/main.css'%}" />
+  <script src="http://code.jquery.com/jquery-latest.min.js"></script>
+  <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>
+  <title>우리가족</title>
+
+
+  <script>
+
+    $(function() {
+      // GNB 클릭
+      $('#menu ul li').on('click', function() {
+        $('#menu ul li').removeClass('active');
+        $(this).addClass('active');
+      });
+  
+      // 검색창
+      $('#searchBtn').click(function(){
+        $("#main_search").removeClass('closed').addClass('open');
+        $('#s_overlay').addClass('show');
+      });
+    $('#search_closeBtn').click(function(){
+      $("#main_search").removeClass('open').addClass('closed');
+      $('#s_overlay').removeClass('show');
+    });
+    $('#s_overlay').click(function() { //배경 클릭하면 닫히게
+      $('#main_search').removeClass('open').addClass('closed');
+      $('#s_overlay').removeClass('show');
+    });
+    // 검색창 검색기능
+    $('.search_box input').on('keypress', function(event){
+      if (event.key == 'Enter') {
+        event.preventDefault(); // 기본 제출 방지
+        // 입력값과 일치하는 일기 찾기
+        ctitle = "{{Content.ctitle}}"
+        cdate = "{{Content.cdate}}"
+        ccontent = "{{Content.ccontent}}"
+        cno = "{{Content.cno}}"
+        //ajax 구문
+        $.ajax({
+          headers:{"X-CSRFToken":$("meta[name='csrf-token']").attr("content")},
+          url:"/main/search/",
+          type:"post",
+          data:{"csearch":$("#csearch").val()}, //views.py데이터 보냄
+          success:function(data){
+            //data -> 넘어온 검색결과
+            console.log("리스트 : "+data.list_qs)
+            console.log("리스트 : "+data.list_qs[0])
+            console.log("리스트개수 : "+data.list_qs.length)
+            //html보내는 부분
+            var hdata = ""
+            // 검색 결과가 있을 경우
+            if (data.list_qs.length > 0){
+              hdata += `<div id="search_result">검색 결과 <span>(${data.list_qs.length})</span></div>`
+              for(var i=0;i<data.list_qs.length;i++){
+                // cdate를 Date 객체로 변환 > 0년0월0일로 형식 변환
+                var cdate = new Date(data.list_qs[i].cdate);
+                var formattedDate = cdate.getFullYear() + "년 " + (cdate.getMonth() + 1) + "월 " + cdate.getDate() + "일";
+                hdata += `<div class="search_list"><a href="/diary/diary_view/${data.list_qs[i].cno}/" class="result-item">
+                  <span class="s_title"> ${data.list_qs[i].ctitle}</span>
+                  <span class="s_date">${formattedDate}</span>
+                  <img src="/static/images/home/right.png" alt="">
+                  </a>
+                  </div>`;
+                  }
+            }else{
+              // 검색 결과가 없을 경우
+              hdata += `<div id="search_result">검색 결과 <span>(${data.list_qs.length})</span></div>`
+              hdata += `<div class="search_list"><a>
+                <span class="s_title">검색하신 내용과 일치하는 결과가 없어요.</span>
+                <span class="s_date"></span>
+              </a></div>`;
+            }
+                $("#search_content").html(hdata);
+              },
+              error:function(){
+                alert("에러")
+              }
+            })
+          }
+      });
+  
+    });
+  
+    // -------------알림창-----------------
+    $(function() {
+      // 페이지 로드 시 알림 상태 확인
+      fetchNotifications();
+  
+      // 알림창 열기
+      $('#notiBtn').click(function() {
+          $('#noti_side').removeClass('closed').addClass('open');
+          $('#n_overlay').addClass('show');
+  
+          // 알림 데이터 가져오기
+          fetchNotifications();
+      });
+  
+      // 알림창 닫기
+      $('#noti_closeBtn, #n_overlay').click(function() {
+          $('#noti_side').removeClass('open').addClass('closed');
+          $('#n_overlay').removeClass('show');
+      });
+  
+      // 알림 데이터 가져오는 함수
+      function fetchNotifications() {
+          $.ajax({
+              url: '/main/notification/', // 알림 데이터를 가져올 URL
+              method: 'GET',
+              success: function(data) {
+                  let hasUnread = false; // 읽지 않은 알림 여부
+                  let hdata = ""; // 알림 내용을 담을 HTML
+  
+                  if (data.notifications.length > 0) {
+                      data.notifications.forEach(function(notification) {
+                          if (!notification.checked) {
+                              hasUnread = true; // 읽지 않은 알림 존재
+                          }
+                          hdata += `
+                              <li class="noti_list ${notification.checked ? 'checked' : ''}" data-id="${notification.id}">
+                                  <a>
+                                      <div>
+                                          <img src="/static/images/home/default_profile.png" alt="프로필이미지">
+                                      </div>
+                                      <div>
+                                          <p>${notification.message}</p>
+                                          <p class="noti_date">${notification.ndate}</p>
+                                      </div>
+                                  </a>
+                              </li>
+                          `;
+                      });
+                  } else {
+                      hdata = `
+                          <li class="noti_list">
+                              <p>새로운 알림이 없습니다.</p>
+                          </li>
+                      `;
+                  }
+  
+                  $('#noti_list').html(hdata); // 알림 UI 업데이트
+  
+                  // 빨간 점 표시
+                  if (hasUnread) {
+                      $('#notiBtn .notification-dot').show(); // 읽지 않은 알림이 있으면 빨간 점 표시
+                  } else {
+                      $('#notiBtn .notification-dot').hide(); // 없으면 숨김
+                  }
+              },
+              error: function(error) {
+                  console.error('Error fetching notifications:', error);
+              }
+          });
+      }
+  
+      // 알림 리스트 클릭 시 배경색 변경 및 읽음 처리
+      $('#noti_list').on('click', '.noti_list', function () {
+          const notificationId = $(this).data('id'); // 알림 ID 가져오기
+  
+          if (notificationId) {
+              $(this).addClass('read'); // 읽음 상태로 변경
+              $(this).css('background-color', 'white'); // 즉시 배경색 변경
+  
+              // 서버에 읽음 상태 동기화 요청
+              markNotificationAsRead(notificationId);
+          }
+      });
+  
+      // 알림 읽음 처리 함수
+      function markNotificationAsRead(notificationId) {
+          $.ajax({
+              url: `/main/notification_read/${notificationId}/`, // 알림 읽음 처리 URL
+              method: 'POST',
+              headers: { 'X-CSRFToken': $("meta[name='csrf-token']").attr("content") },
+              success: function () {
+                  console.log('Notification marked as read.');
+                  // 읽음 상태 업데이트 후 빨간 점 재확인
+                  fetchNotifications();
+              },
+              error: function (error) {
+                  console.error('Error marking notification as read:', error);
+              }
+          });
+      }
+  
+      // 5초마다 읽지 않은 알림 상태 확인
+      setInterval(fetchNotifications, 5000);
+  });
+  
+    function diaryWriteBtn() {
+        // 알림 메시지 표시
+        alert("일기를 작성하러 이동합니다!");
+  
+        // 일기 작성 창으로 이동 (URL은 원하는 페이지로 변경)
+        window.location.href = "/diary/diaryWrite/";
+    }
+  
+    function pastdiaryBtn() {
+        // 일기 작성 창으로 이동 (URL은 원하는 페이지로 변경)
+        window.location.href = "/diary/diary_view/{{past.cno}}/";
+    }
+  
+    function family_Btn() {
+        // 일기 작성 창으로 이동 (URL은 원하는 페이지로 변경)
+        window.location.href = "/family1/fam/";
+    }
+    
+    document.addEventListener('DOMContentLoaded', () => {
+      const toggleButton1 = document.getElementById('toggleButton1');
+      const mainMe = document.getElementById('main_me');
+      const smallList1 = document.getElementById('small_list1');
+      const smallItems1 = smallList1.querySelectorAll('.small_list_1');
+      const smallToggle1 = document.getElementById('small_toggle_id1');
+      const smallToggle2 = document.getElementById('small_toggle_id2');
+      const toggleButton2 = document.getElementById('toggleButton2');
+      const mainMe2 = document.getElementById('main_me2');
+      const smallList2 = document.getElementById('small_list2');
+      const smallItems2 = smallList2.querySelectorAll('.small_list_2');
+      const editButton = document.getElementById('king');
+      const deleteButtons1 = document.querySelectorAll('.list_deleteBtn');
+      const addButtonToggle = document.getElementById('add_Btn_toggle');
+      const addInput = document.getElementById('add_Btn_input');
+      const addButton = document.getElementById('add_Bton');
+      
+      // "더보기" 버튼 표시 여부 처리
+      const toggleMoreButtonVisibility = (items, toggle) => {
+        toggle.style.display = items.length <= 4 ? 'none' : 'block';
+      };
+      toggleMoreButtonVisibility(smallItems1, smallToggle1);
+      toggleMoreButtonVisibility(smallItems2, smallToggle2);
+      
+      // "더보기" 버튼 클릭 시 동작
+      const toggleListVisibility = (toggleButton, mainMe, smallList, toggleText) => {
+        toggleButton.addEventListener('click', () => {
+          const expanded = mainMe.classList.toggle('expanded');
+          smallList.classList.toggle('expanded');
+          toggleButton.textContent = expanded ? '접기' : toggleText;
+        });
+      };
+      
+      toggleListVisibility(toggleButton1, mainMe, smallList1, '더보기');
+      toggleListVisibility(toggleButton2, mainMe2, smallList2, '더보기');
+      
+      // 편집 상태 관리
+      let isEditing = false;
+
+      editButton.addEventListener('click', () => {
+        // 상태 토글
+        isEditing = !isEditing;
+
+        if (isEditing) {
+          // "편집" -> "완료" 상태로 전환
+          editButton.textContent = '완료';
+          editButton.style.color = 'blue';
+          editButton.style.textDecoration = 'underline';
+          deleteButtons1.forEach(button => (button.style.display = 'inline-block'));
+          addButtonToggle.style.display = 'block';
+
+          // "더보기" 상태를 해제
+          if (toggleButton1.textContent === '더보기') toggleButton1.click();
+
+          // smallToggle1 숨기기
+          if (smallToggle1) smallToggle1.style.display = 'none';
+        } else {
+          // "완료" -> "편집" 상태로 전환
+          editButton.textContent = '편집';
+          editButton.style.color = '';
+          editButton.style.textDecoration = '';
+          deleteButtons1.forEach(button => (button.style.display = 'none'));
+          addButtonToggle.style.display = 'none';
+          addInput.style.display = 'none';
+          
+
+          // smallToggle1 원래 상태로 복원
+          if (smallList1.querySelectorAll('.small_list_1').length > 4) {
+            smallToggle1.style.display = 'block';
+          }
+        }
+      });
+
+  // 맴버 추가하기 인풋 등장
+  if (addButton) {
+    addButton.addEventListener('click', () => {
+      addInput.style.display = 'block';
+    });
+  }
+});
+    
+    
+    
+    $(document).on('click', '.list_deleteBtn', function() {
+      const memberId = $(this).data('member-id'); // 버튼에서 member_id 가져오기
+      const currentUserId = '{{ user.id }}';  // 현재 로그인한 사용자 ID (서버에서 렌더링된 변수)
+  
+      // 자기 자신을 삭제하려는 경우 처리
+      if (memberId === currentUserId) {
+          alert('자기 자신은 삭제할 수 없습니다.');
+          return;  // 자기 자신 삭제 시 요청을 보내지 않음
+      }
+    
+      // 삭제 확인 메시지 추가 (옵션)
+      if (!confirm('정말 이 멤버를 삭제하시겠습니까?')) {
+          return;  // 사용자가 취소 버튼을 클릭하면 요청을 보내지 않음
+      }
+    
+      // 삭제 요청 보내기
+      $.ajax({
+          url: '/family1/delete_member/' + memberId + '/',
+          type: 'POST',
+          data: {
+              'csrfmiddlewaretoken': '{{ csrf_token }}'
+          },
+          success: function(response) {
+              alert('멤버가 삭제되었습니다.');
+              location.reload();  // 삭제 후 페이지 새로 고침
+          },
+          error: function(xhr, errmsg, err) {
+              console.log('memberId:', memberId);
+              console.log('XHR response:', xhr.responseText);  // 서버에서 받은 전체 응답 내용 출력
+              alert('삭제에 실패했습니다. 오류: ' + errmsg);  // 메시지 출력
+          }
+      });
+  });
+    
+
+    // 맴버 추가
+    $(document).on('click', '#add_Bton', function() {
+      const memberId = $('#add_input').val().trim();  // 입력된 ID 가져오기
+  
+      if (!memberId) {
+        return;
+      }
+      // CSRF 토큰 가져오기
+      const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+      $.ajax({
+        url: '/family1/add_member/',  // 추가할 뷰의 URL
+        type: 'POST',
+        headers: { 'X-CSRFToken': csrftoken }, // CSRF 토큰 추가
+        data: {
+          'member_id': memberId
+        },
+        success: function(response) {
+          if (response.success) {
+            alert("멤버가 추가되었습니다.");
+            location.reload();  // 추가 후 페이지 새로 고침
+          } else {
+            alert(response.error);
+          }
+        },
+        error: function(xhr, errmsg, err) {
+          alert('서버 요청에 실패했습니다.');
+        }
+      });
+    });
+    
+
+  </script>
+</head>
+
+<body>
+	<!-- 최상단 메뉴 -->
+	<div id="top_nav">
+		<h1><a href="/main/index/"></a></h1>
+		<ul class="top_menu">
+			<li><a id="searchBtn"><img src="/static/images/home/search_icon.png" alt=""></a></li>
+			<li>
+				<a id="notiBtn">
+						<img src="/static/images/home/bell_off_icon.png" alt="">
+						<span class="notification-dot"></span> <!-- 빨간점을 표시할 요소 추가 -->
+				</a>
+		</li>
+			<li><a href="/mypage/main/">마이페이지</a></li>
+		</ul>
+
+	</div>
+
+  <!-- 좌측 gnb -->
+  <div id="gnb">
+    <!-- 프로필 -->
+    <div id="user_profile">
+      <div id="pimg">
+        <img src="{{ qb.img.url }}" alt="" />
+      </div>
+      <p id="uName">{{user.name}}</p>
+      <p id="uEmail">{{user.mail}}</p>
+    </div>
+
+    <!-- Nav -->
+    <nav id="menu">
+      <ul>
+        <a href="/main/index/"><li class="menu_item">우리 가족 이야기</li></a>
+        <a href="/diary/diaryHome/"><li class="menu_item">다이어리</li></a>
+        <a href="/emotion/main/"><li class="menu_item">감정 돌아보기</li></a>
+        <a href="/family1/fam/"><li class="menu_item active">우리가족</li></a>
+        <a href="/calendar1/cal/"><li class="menu_item">캘린더</li></a>
+        <a href="/customer/"><li class="menu_item">알려드려요</li></a>
+      </ul>
+    </nav>
+
+    <!-- logout -->
+    <div id="logout">
+      <a href="/main/logout/"><span>로그아웃</span></a>
+    </div>
+  </div>
+
+  <!-- 검색창 슬라이드 -->
+  <div id="s_overlay" class="s_overlay"></div>
+  <div id="main_search" class="search_bar closed">
+    <div id="input_wrap">
+      <form action="/main/search/" method="POST" name="searchFrm" id="searchFrm">
+        <div class="search_box">
+          {% csrf_token %}
+          <input type="text" id="csearch" placeholder="다이어리에서 찾고 싶은 내용을 입력하세요.">
+          <img src="/static/images/home/search_icon.png" alt="">
+        </div>
+      </form>
+        <button type="button" id="search_closeBtn">
+          <img src="/static/images/home/close_icon.png" alt="알림창닫기">
+        </button>
+    </div>
+      <div id="search_content">
+        <div id="search_result">
+        </div>
+        <div class="search_list">
+          <a>
+            <span class="s_title">찾고자 하는 일기를 검색해 보세요.</span>
+            <span class="s_date"></span>
+          </a>
+        </div>
+      </div>
+    </div>
+	
+	<!-- 알림창 슬라이드 -->
+	<div id="n_overlay" class="n_overlay"></div>
+	<div id="noti_side" class="sidebar closed">
+		<div class="noti_header">
+			<h2>알림</h2>
+			<button id="noti_closeBtn"><img src="/static/images/home/close_icon.png" alt="알림창닫기"></button>
+    </div>
+    <ul id="noti_list">
+			{% for notification in notifications %}
+			<li class="noti_list {% if notification.checked %}checked{% endif %}">
+					<a href="#">
+							<div>
+									<img src="/static/images/home/default_profile.png" alt="프로필이미지">
+							</div>
+							<div>
+									<p>{{ notification.message }}</p>
+									<p class="noti_date">{{ notification.ndate|date:"Y-m-d H:i" }}</p>
+							</div>
+					</a>
+			</li>
+			{% empty %}
+			<li class="noti_list">
+					<p>새로운 알림이 없습니다.</p>
+			</li>
+			{% endfor %}
+	</ul>
+	</div>
+
+
+  <!-- container -->
+  <div id="main_title">
+    <h1>우리가족</h1>
+    <div id="top_name">가족구성원</div>
+    <div id='main_tool'>
+      <div id="non" class="{% if has_group %}hide{% else %}show{% endif %}">가족이 존재하지 않습니다. 가족을 추가하세요.<br>
+      <a href="/diary/diaryMake/" id="hidden_a">가족 추가하러 가기</a>
+      </div>
+      <form method="post">
+        {% csrf_token %}
+        <div id ="back_cover">
+          
+          
+          
+          <div id="main_me" class="{% if created_group %}show{% else %}hide{% endif %}">
+            <div id = "of">
+              <div id="small_title1" class="small_title">{{created_group_name}}</div>
+              <button type='button' id='king'>편집</button>
+            </div>
+            
+            <div class="small_list" id="small_list1">
+              {% if joined_group_members %}
+              {% for member in joined_group_members%}
+              <div class="small_list_1">
+                <div class="small_img"><img src="{{ member.img }}" alt="" /></div>
+                <div class="summ">
+                  <div class="small_name">{{member.member.name}}</div>
+                  <div class="small_bir">{{member.member.birthday}}</div>
+                  <button type=button class="list_deleteBtn" data-member-id="{{ member.member.id }}">삭제</button>
+                </div>
+              </div>
+              {% endfor %}
+              {% endif %}
+              
+              
+            </div>
+            <div id="add_Btn_input" style="display: none;">
+              <input type="text" name = "add_member1" id="add_input" placeholder="  추가할 맴버의 아이디를 검색하세요.">
+            </div>
+            <div id="add_Btn_toggle" style="display: none;">
+              <button type="button" id="add_Bton">맴버추가하기</button>
+            </div>
+            <div class="small_toggle" id='small_toggle_id1'>
+              <div id="toggleButton1">더보기</div>
+            </div>
+          </form>
+
+        </div>
+        <div id="main_me2" class="{% if joined_group %}show{% else %}hide{% endif %}">
+          <div id="small_title1" class="small_title">{{joined_group_name}}</div>
+          <div class="small_list" id="small_list2">
+            {% if created_group_members %}
+              {% for member in created_group_members %}
+              <div class="small_list_2">
+                <div class="small_img"><img src="{{ member.img }}" alt="" /></div>
+                <div class="summ">
+                  <div class="small_name">{{member.member.name}}</div>
+                  <div class="small_bir">{{member.member.birthday}}</div>
+                </div>
+              </div>
+              {% endfor %}
+            {% endif %}
+          </div>
+          
+          <div class="small_toggle" id='small_toggle_id2'>
+            <div id="toggleButton2">더보기</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <div></div>
+
+  <!-- footer -->
+  <div id="footer">
+		<div id="f_logo_wrap">
+			<img src="/static/images/home/logo_sample.png" alt="">
+		</div>
+		<div id="f_link">
+			<ul>
+				<li><a href="">공지사항 보기</a></li>
+				<li>|</li>
+				<li><a href="">포스트 보기</a></li>
+				<li>|</li>
+				<li><a href="">개인정보처리방침</a></li>
+				<li>|</li>
+				<li><a href="/admin1/login/">관리자페이지(임시링크)</a></li>
+			</ul>
+		</div>
+		<div id="f_txt">
+			<ul>
+				<li>상호 : (주)프로젝트파이터</li>
+				<li>|</li>
+				<li>대표자 : 홍길동</li>
+				<li>|</li>
+				<li>개인정보보호책임 : 유관순</li>
+			</ul>
+			<ul>	
+				<li>사업자등록번호 : 123-45-67890</li>
+				<li>|</li>
+				<li>통신판매업신고번호 : 제1234-서울금천-5678호</li>
+			</ul>
+			<ul>	
+				<li>주소 : 서울 금천구 가산디지털2로 101 한라원앤원타워 B동 3층</li>
+				<li>|</li>
+				<li>고객센터 : 02-1234-5678</li>
+			</ul>
+			
+		</div>
+	</div>
+
+</body>
+
+</html>

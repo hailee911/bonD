@@ -1,0 +1,255 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link rel="stylesheet" href="{% static 'css/admin1/admin_memllist.css'%}">
+		<link rel="stylesheet" href="{% static 'css/admin1/admin_login.css'%}">
+		<script  src="http://code.jquery.com/jquery-latest.min.js"></script>
+		<title>포스트</title>
+
+		<style>
+			/* 기본 슬라이드 스타일 */
+				.switch {
+					position: relative;
+					display: inline-block;
+					width: 60px;
+					height: 34px;
+				}
+		
+				.switch input {
+					opacity: 0;
+					width: 0;
+					height: 0;
+				}
+		
+				.slider {
+					position: absolute;
+					cursor: pointer;
+					top: 0;
+					left: 0;
+					right: 0;
+					bottom: 0;
+					background-color: #ccc;
+					transition: 0.4s;
+					border-radius: 34px;
+				}
+		
+				.slider:before {
+					position: absolute;
+					content: "";
+					height: 26px;
+					width: 26px;
+					border-radius: 50%;
+					left: 4px;
+					bottom: 4px;
+					background-color: white;
+					transition: 0.4s;
+				}
+		
+				input:checked + .slider {
+					background-color: #4CAF50;
+				}
+		
+				input:checked + .slider:before {
+					transform: translateX(26px);
+				}
+		
+				/* 상태 텍스트 추가 */
+				.status-text {
+					display: inline-block;
+					margin-left: 10px;
+					font-size: 16px;
+				}
+		</style>
+
+		<script>
+			if('{{request.session.session_role}}'=='1'){
+				alert("접근 권한이 없습니다.")
+				location.href = '/admin1/admin_memList/'
+			}
+			if('{{dmsg}}'!=''){
+				alert("게시글이 삭제되었습니다.")
+				location.href='/admin1/admin_postList/'
+			}
+			if('{{wmsg}}' == '1'){
+				alert("포스트가 등록되었습니다.")
+				location.href='/admin1/admin_postList/'
+			}
+			$(function(){
+				$("#a_logout").click(function(){
+					if(confirm("로그아웃 하시겠습니까?")){
+						location.href='/admin1/logout/'
+					}
+				})
+				$("#postAddBtn").click(function(){
+					location.href = '/admin1/admin_postWrite/'
+				})
+			});
+			// 체크박스 체크 삭제
+			$(document).ready(function() {
+				$('#dBtn').click(function() {
+					// 선택된 체크박스의 데이터를 배열로 저장
+					const selectedMembers = [];
+					document.querySelectorAll('.select_member:checked').forEach((checkbox) => {
+						const href = checkbox.closest('tr').querySelector('.member_name a').getAttribute('href'); // href 추출
+						const bno = href.split('/').filter(Boolean).pop(); // URL에서 bno 추출
+						selectedMembers.push(bno);
+					});
+					
+					// 선택된 글 없을 경우 알림
+					if (selectedMembers.length === 0) {
+						alert("삭제할 게시글을 선택해주세요.");
+						return;
+					}
+					
+					// 확인 창
+					if (!confirm("선택된 게시글을 삭제하시겠습니까?")) {
+						return;
+					}
+
+					// AJAX로 데이터 전송
+					$.ajax({
+						url: '/admin1/admin_notisDelete/', // 삭제 요청을 처리할 URL
+						method: 'POST',
+						data: JSON.stringify({ members: selectedMembers }),
+						contentType: 'application/json',
+						headers: {
+								'X-CSRFToken': '{{ csrf_token }}',
+							},
+							success: function(response) {
+								alert("선택된 게시글이 삭제되었습니다.");
+								location.reload(); // 페이지 새로고침
+							},
+							error: function(error) {
+								alert("게시글 삭제 중 오류가 발생했습니다. 다시 시도해주세요.");
+								console.error(error);
+						},
+					});
+				});
+			});
+			// 전체 선택 기능
+			const selectAllCheckbox = document.getElementById('select_all');
+			const memberCheckboxes = document.querySelectorAll('.select_member');
+			
+			selectAllCheckbox.addEventListener('change', function () {
+					memberCheckboxes.forEach(checkbox => {
+							checkbox.checked = selectAllCheckbox.checked;
+					});
+			});
+		</script>
+	</head>
+	<body>
+	<nav class="gnb">
+		<a href="#" class="logo"><img src="/static/images/admin1/logo_sample.png" alt=""></a>
+		<div class="menu">
+			<a href="/admin1/admin_memList/">회원관리</a>
+			<a href="#">판매관리</a>
+			<a href="/admin1/admin_noticeList/">공지사항</a>
+			<a href="/admin1/admin_postList/" class='active'>포스트</a>
+			<a href="/admin1/admin_qList/" >1:1문의</a>
+			<a href="/admin1/admin_adminList/">관리자설정</a>
+			<a id='a_logout'>로그아웃</a>
+		</div>
+	</nav>
+	<div class="container">
+		<div class="con_header">
+			<h2>포스트</h2>
+			<button id="postAddBtn" type="button">포스트 추가</button>
+			<button id="dBtn" type="button">포스트 삭제</button>
+		</div>
+		<table>
+			<colgroup>
+        <col style="width: 5%;"> <!-- 체크박스 열 -->
+        <col style="width: 10%;"> <!-- 번호 열 -->
+        <col style="width: 55%;"> <!-- 제목 열 -->
+        <col style="width: 10%;"> <!-- 작성자 열 -->
+        <col style="width: 10%;"> <!-- 작성일 열 -->
+        <col style="width: 10%;"> <!-- 게시 상태 열 -->
+    	</colgroup>
+			<thead>
+				<tr>
+					<th><input type="checkbox" id="select_all"></th>
+					<th>번호</th>
+					<th>공지제목</th>
+					<th>작성자</th>
+					<th>작성일</th>
+					<th>게시상태</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for post in postList %}
+				<tr>
+					<td><input type="checkbox" class="select_member"></td>
+					<td>{{forloop.revcounter}}</td> 
+					<td class="member_name"><a href="/admin1/admin_postView/{{post.bno}}/">{{post.btitle}}</a></td>
+					<td>{{post.member.name}}</td>
+					<td>{{post.bdate|date:'y-m-d H:i:s'}}</td>
+					<td>
+						<label class="switch">
+							<input type="checkbox" class="toggleStatus" {% if post.status == '게시중' %}checked{% endif %}>
+							<span class="slider"></span>
+						</label>
+						<span class="status-text">{{ post.status }}</span> <!-- 상태 텍스트 -->
+					</td>
+				</tr>
+				{% empty %}
+    		<tr>
+       	 <td colspan="6" style="text-align: center;">등록된 포스트가 없습니다.</td>
+    		</tr>
+				{% endfor %}
+				<!-- 데이터 추가 반복 -->
+			</tbody>
+		</table>
+	</div>
+
+	<script>
+
+		// 게시중 게시안함
+		document.querySelectorAll(".toggleStatus").forEach(toggle => {
+			toggle.addEventListener("change", function () {
+					const row = this.closest("tr"); // 현재 행 가져오기
+					const statusText = row.querySelector(".status-text");
+					const status = this.checked ? "게시중" : "게시안함";
+					
+					// 상태 텍스트 갱신
+					if (statusText) {
+							statusText.textContent = status;
+					} else {
+							console.error("status-text 요소를 찾을 수 없습니다.");
+					}
+	
+					// 해당 게시글 번호(bno) 추출
+					const bno = row.querySelector(".member_name a").getAttribute("href").split("/").filter(Boolean).pop();
+					
+					// AJAX로 서버에 상태 변경 요청 보내기
+					fetch('/admin1/admin_noticeList/status_chg/', {
+							method: 'POST',
+							headers: {
+									'Content-Type': 'application/json',
+									'X-CSRFToken': '{{ csrf_token }}',
+							},
+							body: JSON.stringify({
+									status: status,
+									bno: bno
+							})
+					})
+					.then(response => response.json())
+					.then(data => {
+							if (!data.success) {
+									alert("상태 업데이트 실패");
+							}
+					})
+					.catch(error => {
+							console.error("Error:", error);
+							alert("상태 업데이트 중 오류가 발생했습니다.");
+					});
+			});
+		});
+
+
+	</script>
+
+</body>
+</html>

@@ -1,0 +1,215 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
+}
+a {
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+}
+ol, ul {
+  list-style: none;
+}
+body, html {
+  height: 100%;
+}
+table, tr, td{
+  border-collapse: collapse;
+  color: #333;
+  font-size: 14px;
+}
+/* container */
+#container{
+  width: 100%;
+  min-height: 100vh; /* 화면 높이와 동일하게 설정 */
+  padding: 100px 100px 100px 334px;
+  margin-bottom: 35px;
+}
+.emotion_graph_m, .emotion_graph_w, .emotion_graph_r, .family_graph_r, .family_graph_l, .personal_graph, .personal_graph_r{
+  border-radius: 20px;
+  background: #FFFFFF;
+  box-shadow:  5px 5px 13px #E0E0E0,
+             -5px -5px 13px #FFFFFF;
+  /* box-shadow: 9px 9px 18px #E6E6E6, -9px -9px 18px #FFFFFF; */
+  /* inset 14px 18px 17.1px rgba(255, 255, 255, 0.27); */
+}
+/* 감정 돌아보기 상단 */
+#emotion_top {
+  width: 100%;
+}
+#emotion_top h2{
+  font-size: 22px;
+  font-weight: 500;
+}
+#emotion_main_top{
+  width: 100%;
+  margin-top: 58px;
+}
+#emotion_main_top p{
+  color: #444;
+  font-size: 26px;
+  font-weight: 400;
+}
+.emotion_main_graph{
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  margin-top: 34px;
+}
+.emotion_main_graph div{
+  height: 380px;
+}
+.emotion_graph_m {
+  width: 30%;
+  margin: 0 15px 0 0;
+}
+.emotion_graph_w{
+  width: 30%;
+  margin: 0 30px 0 15px;
+}
+/* AI 분석 */
+.emotion_graph_r {
+  width: 40%;
+}
+.emotion_main_graph .graph_r_title {
+  height: 50px;
+  padding: 24px 20px 0px 20px;
+  box-sizing: border-box;
+  margin-bottom: 30px;
+}
+.graph_r_title span{
+  font-size: 20px;
+  font-weight: 500;
+  margin-right: 6px;
+}
+.graph_r_title img{
+  vertical-align: middle;
+  cursor: pointer;
+}
+.emotion_main_graph .graph_r_content{
+  display: flex;
+  padding-top: 15px;
+  height: 230px;
+}
+.emoji {
+  margin: 0 10px 0 20px;
+  width: 34px;
+  display: inline-block;
+}
+.emoji li {
+  display: flex;
+  height: 60px;
+  align-items: center;
+}
+.emoji img{
+  width: 35px;
+  height: 35px;
+  object-fit: cover;
+}
+.comment{
+  display: inline-block;
+  margin-right: 30px;
+}
+.comment li{
+  display: flex;
+  height: 60px;
+  align-items: center;
+  line-height: 25px;
+}
+.emotion_graph_r button{
+  width: 155px;
+  height: 45px;
+  background: white;
+  border: 1px solid #D9D9D9;
+  margin: 0 0 20px 20px;
+  font-size: 18px;
+  cursor: pointer;
+}
+#emotion_main_bottom{
+  width: 100%;
+  margin: 80px 0 0 0;
+  display: flex;
+}
+#emotion_main_bottom span{
+  font-size: 24px;
+  font-weight: lighter;
+}
+#emotion_main_bottom_left{
+  margin-right: 30px;
+  width: 45%;
+}
+#emotion_main_bottom .graph_r_title{
+  display: flex;
+  text-align: center;
+}
+#emotion_main_bottom .graph_r_title span{
+  font-size: 20px;
+  font-weight: 500;
+  margin-right: 6px;
+  width: 100%;
+}
+.family_graph_r {
+  width: 300px;
+  margin: 0 30px 0 0;
+}
+.family_graph_l {
+  width: 55%;
+}
+#emotion_main_bottom_right{
+  width: 55%;
+}
+.personal_graph{
+  width: 45%;
+}
+.personal_graph_r{
+  width: 55%;
+  margin-left: 30px;
+  padding: 80px 0 0 25px;
+}
+.personal_graph_r div{
+  width: 100%;
+  height: 30px;
+  display: flex;
+}
+
+.emotion_graph_mm .tick{
+  font-size: 15px;
+  font-weight: bold;
+}
+
+.emotion_graph_ww .value-text{
+  font-size: 13px;
+}
+
+.emotion_graph_ww .value-text + tspan {
+  font-size: 15px;
+  font-weight: bold;
+}
+
+.family_graph_ll .tick{
+  font-size: 15px;
+  font-weight: bold;
+}
+
+.personal_graphh .tick{
+  font-size: 15px;
+  font-weight: bold;
+}
+
+.nonecomm{
+  text-align: center;
+  font-size: 15px;
+  font-weight: 400px;
+  margin-top: 100px;
+  color: #666;
+}
+
+.nonelike{
+  text-align: center;
+  font-size: 15px;
+  font-weight: 400px;
+  margin-top: 100px;
+  color: #666;
+}

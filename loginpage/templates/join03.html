@@ -1,0 +1,54 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
+  <link rel="stylesheet" type="text/css" href="{% static '/css/login/join1.css'%}">
+  <title>회원가입 페이지</title>
+  
+</head>
+<body>
+    <div class="container">
+        <div class="image-section">
+            <img src="{% static '/images/login/join_login_index.svg'%}" alt="">
+            </svg>
+        </div>
+        <div class="join_form">
+            <h2>사용자 정보 입력</h2>
+            <span>사용자 정보를 입력해주세요.</span>
+
+            <form action="" method="POST" name="join03Frm">
+                {% csrf_token %}
+
+                <input type="hidden" name = "id" value="{{id}}">
+                <input type="hidden" name = "pw" value="{{pw}}">
+                <input type="hidden" name = "full_mail" value="{{full_mail}}">
+                <div class="join3_span1">
+                    <label for="name">이름*</label>
+                    <div class="join3_error-message" id="join3_errorMessage1">이름을 입력해주세요.</div>
+                </div>
+                <input type="text" id="name" class="join3_input" name="name" placeholder="이름을 입력해주세요.">
+                <div class="join3_span1">
+                    <label for="date">생년월일*</label>
+                    <div class="join3_error-message" id="join3_errorMessage2">생년월일을 입력해주세요.</div>
+                </div>
+                <input type="date" class="join3_input" name="date" id="date" placeholder="ex)2000-12-01">
+                <div class="join3_span1">
+                    <label>성별*</label>
+                    <div class="join3_error-message" id="join3_errorMessage3">성별을 선택해주세요.</div>
+                </div>
+                <div class="gender">
+                    <input type="radio" id="male" name="gender" value="남자">
+                    <label for="male">남자</label>
+                    <input type="radio" id="female" name="gender" value="여자">
+                    <label for="female">여자</label>
+                </div>
+                <button type="button" id="join03button">회원가입 완료</button>
+            </form>
+            <script src="{% static '/js/login/join03.js'%}"></script>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,85 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdeliv.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
+<link rel="stylesheet" href="{% static 'css/admin1/admin_memAdd.css'%}">
+<link rel="stylesheet" href="{% static 'css/admin1/admin_login.css'%}">
+<script  src="http://code.jquery.com/jquery-latest.min.js"></script>
+<title>회원정보</title>
+<script>
+	if("{{dmsg}}"!=''){
+		alert("{{dmsg}} 회원정보를 삭제했습니다.")
+		location.href = '/admin1/admin_memList/'
+	}
+	$(function(){
+		$("#a_logout").click(function(){
+			if(confirm("로그아웃 하시겠습니까?")){
+				location.href='/admin1/logout/'
+			}
+		})
+		$("#updateBtn").click(function(){
+			alert("{{mem.name}} 님 회원 정보 수정페이지로 이동합니다.")
+			location.href = '/admin1/admin_memUpdate/{{mem.id}}/'
+		})
+		$("#cBtn").click(function(){
+			location.href='/admin1/admin_memList/'
+		})
+		$("#delBtn").click(function(){
+			if(confirm("{{mem.name}} 님 회원 정보를 삭제하시겠습니까? 삭제시 복구가 불가능합니다.")){
+				location.href = '/admin1/admin_memDelete/{{mem.id}}/'
+			}
+		})
+	});
+</script>
+</head>
+<body>
+	<nav class="gnb">
+		<a href="/admin1/admin_memList/" class="logo"><img src="/static/images/admin1/logo_sample.png" alt=""></a>
+		<div class="menu">
+			<a href="/admin1/admin_memList/" class='active'>회원관리</a>
+			<a href="#">판매관리</a>
+			<a href="/admin1/admin_noticeList/">공지사항</a>
+			<a href="/admin1/admin_postList/">포스트</a>
+			<a href="/admin1/admin_qList/" >1:1문의</a>
+			<a href="/admin1/admin_adminList/">관리자설정</a>
+			<a id='a_logout'>로그아웃</a>
+		</div>
+	</nav>
+	<div class="container">
+		<div class="con_header">
+			<h2>{{mem.name}} 님 회원 정보</h2>
+		</div>
+		<form action="" method="POST" id="addFrm" name="addFrm">
+			{% csrf_token %}
+			<label for="user_id">아이디</label>
+			<br>
+			<input type="text" id="user_id" name="user_id" value="{{mem.id}}" style="border:0; font-size:17px; font-weight:600" required readonly>
+			<br>
+			<label for="user_name">회원이름</label>
+			<br>
+			<input type="text" id="user_name" name="user_name" value="{{mem.name}}" style="border:0; font-size:17px; font-weight:600" required readonly>
+			<br>
+			<label for="nickname">닉네임</label>
+			<br>
+			<input type="text" id="nickname" name="nickname" value="{{mem.nicName}}" style="border:0; font-size:17px; font-weight:600" readonly>
+			<br>
+			<label for="email">이메일</label>
+			<br>
+			<input type="email" id="email" name="email" value="{{mem.mail}}" style="border:0; font-size:17px; font-weight:600" required readonly>
+			<br>
+			<label for="sdate">가입일</label>
+			<br>
+			<input type="date" id="sdate" name="sdate" value="{{mem.mdate|date:'Y-m-d'}}" style="border:0; font-size:17px; font-weight:600" required readonly>
+			<br>
+			<button type="button" id='updateBtn'>수정하기</button>
+			<button type="button" id='delBtn'>회원삭제</button>
+			<button type="button" id='cBtn'>뒤로가기</button>
+		</form>
+	</div>
+
+
+</body>
+</html>

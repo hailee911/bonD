@@ -1,0 +1,597 @@
+{%load static%}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="csrf-token" content="{{ csrf_token }}">
+  <link rel="stylesheet" href="{% static 'css/diary/diary_view.css'%}">
+  <link rel="stylesheet" href="{% static 'css/home/main.css'%}">
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
+  <script  src="http://code.jquery.com/jquery-latest.min.js"></script>
+  <title>diary view</title>
+</head>
+
+<!-- 공통 상단좌측메뉴 -->
+<script>
+  $(function() {
+    // GNB 클릭
+    $('#menu ul li').on('click', function() {
+      $('#menu ul li').removeClass('active');
+      $(this).addClass('active');
+    });
+
+    // 검색창
+    $('#searchBtn').click(function(){
+      $("#main_search").removeClass('closed').addClass('open');
+      $('#s_overlay').addClass('show');
+    });
+  $('#search_closeBtn').click(function(){
+    $("#main_search").removeClass('open').addClass('closed');
+    $('#s_overlay').removeClass('show');
+  });
+  $('#s_overlay').click(function() { //배경 클릭하면 닫히게
+    $('#main_search').removeClass('open').addClass('closed');
+    $('#s_overlay').removeClass('show');
+  });
+  // 검색창 검색기능
+  $('.search_box input').on('keypress', function(event){
+    if (event.key == 'Enter') {
+      event.preventDefault(); // 기본 제출 방지
+      // 입력값과 일치하는 일기 찾기
+      ctitle = "{{Content.ctitle}}"
+      cdate = "{{Content.cdate}}"
+      ccontent = "{{Content.ccontent}}"
+      cno = "{{Content.cno}}"
+      //ajax 구문
+      $.ajax({
+        headers:{"X-CSRFToken":$("meta[name='csrf-token']").attr("content")},
+        url:"/main/search/",
+        type:"post",
+        data:{"csearch":$("#csearch").val()}, //views.py데이터 보냄
+        success:function(data){
+          //data -> 넘어온 검색결과
+          console.log("리스트 : "+data.list_qs)
+          console.log("리스트 : "+data.list_qs[0])
+          console.log("리스트개수 : "+data.list_qs.length)
+          //html보내는 부분
+          var hdata = ""
+          // 검색 결과가 있을 경우
+          if (data.list_qs.length > 0){
+            hdata += `<div id="search_result">검색 결과 <span>(${data.list_qs.length})</span></div>`
+            for(var i=0;i<data.list_qs.length;i++){
+              // cdate를 Date 객체로 변환 > 0년0월0일로 형식 변환
+              var cdate = new Date(data.list_qs[i].cdate);
+              var formattedDate = cdate.getFullYear() + "년 " + (cdate.getMonth() + 1) + "월 " + cdate.getDate() + "일";
+              hdata += `<div class="search_list"><a href="/diary/diary_view/${data.list_qs[i].cno}/" class="result-item">
+                <span class="s_title"> ${data.list_qs[i].ctitle}</span>
+                <span class="s_date">${formattedDate}</span>
+                <img src="/static/images/home/right.png" alt="">
+                </a>
+                </div>`;
+                }
+          }else{
+            // 검색 결과가 없을 경우
+            hdata += `<div id="search_result">검색 결과 <span>(${data.list_qs.length})</span></div>`
+            hdata += `<div class="search_list"><a>
+              <span class="s_title">검색하신 내용과 일치하는 결과가 없어요.</span>
+              <span class="s_date"></span>
+            </a></div>`;
+          }
+              $("#search_content").html(hdata);
+            },
+            error:function(){
+              alert("에러")
+            }
+          })
+        }
+    });
+
+  });
+
+  // -------------알림창-----------------
+  $(function() {
+    // 페이지 로드 시 알림 상태 확인
+    fetchNotifications();
+
+    // 알림창 열기
+    $('#notiBtn').click(function() {
+        $('#noti_side').removeClass('closed').addClass('open');
+        $('#n_overlay').addClass('show');
+
+        // 알림 데이터 가져오기
+        fetchNotifications();
+    });
+
+    // 알림창 닫기
+    $('#noti_closeBtn, #n_overlay').click(function() {
+        $('#noti_side').removeClass('open').addClass('closed');
+        $('#n_overlay').removeClass('show');
+    });
+
+    // 알림 데이터 가져오는 함수
+    function fetchNotifications() {
+        $.ajax({
+            url: '/main/notification/', // 알림 데이터를 가져올 URL
+            method: 'GET',
+            success: function(data) {
+                let hasUnread = false; // 읽지 않은 알림 여부
+                let hdata = ""; // 알림 내용을 담을 HTML
+
+                if (data.notifications.length > 0) {
+                    data.notifications.forEach(function(notification) {
+                        if (!notification.checked) {
+                            hasUnread = true; // 읽지 않은 알림 존재
+                        }
+                        hdata += `
+                            <li class="noti_list ${notification.checked ? 'checked' : ''}" data-id="${notification.id}">
+                                <a>
+                                    <div>
+                                        <img src="/static/images/home/default_profile.png" alt="프로필이미지">
+                                    </div>
+                                    <div>
+                                        <p>${notification.message}</p>
+                                        <p class="noti_date">${notification.ndate}</p>
+                                    </div>
+                                </a>
+                            </li>
+                        `;
+                    });
+                } else {
+                    hdata = `
+                        <li class="noti_list">
+                            <p>새로운 알림이 없습니다.</p>
+                        </li>
+                    `;
+                }
+
+                $('#noti_list').html(hdata); // 알림 UI 업데이트
+
+                // 빨간 점 표시
+                if (hasUnread) {
+                    $('#notiBtn .notification-dot').show(); // 읽지 않은 알림이 있으면 빨간 점 표시
+                } else {
+                    $('#notiBtn .notification-dot').hide(); // 없으면 숨김
+                }
+            },
+            error: function(error) {
+                console.error('Error fetching notifications:', error);
+            }
+        });
+    }
+
+    // 알림 리스트 클릭 시 배경색 변경 및 읽음 처리
+    $('#noti_list').on('click', '.noti_list', function () {
+        const notificationId = $(this).data('id'); // 알림 ID 가져오기
+
+        if (notificationId) {
+            $(this).addClass('read'); // 읽음 상태로 변경
+            $(this).css('background-color', 'white'); // 즉시 배경색 변경
+
+            // 서버에 읽음 상태 동기화 요청
+            markNotificationAsRead(notificationId);
+        }
+    });
+
+    // 알림 읽음 처리 함수
+    function markNotificationAsRead(notificationId) {
+        $.ajax({
+            url: `/main/notification_read/${notificationId}/`, // 알림 읽음 처리 URL
+            method: 'POST',
+            headers: { 'X-CSRFToken': $("meta[name='csrf-token']").attr("content") },
+            success: function () {
+                console.log('Notification marked as read.');
+                // 읽음 상태 업데이트 후 빨간 점 재확인
+                fetchNotifications();
+            },
+            error: function (error) {
+                console.error('Error marking notification as read:', error);
+            }
+        });
+    }
+
+    // 5초마다 읽지 않은 알림 상태 확인
+    setInterval(fetchNotifications, 5000);
+});
+
+  
+</script>
+
+<body>
+	<!-- 최상단 메뉴 -->
+	<div id="top_nav">
+		<h1><a href="/main/index/"></a></h1>
+		<ul class="top_menu">
+			<li><a id="searchBtn"><img src="/static/images/home/search_icon.png" alt=""></a></li>
+			<li>
+				<a id="notiBtn">
+						<img src="/static/images/home/bell_off_icon.png" alt="">
+						<span class="notification-dot"></span> <!-- 빨간점을 표시할 요소 추가 -->
+				</a>
+		</li>
+			<li><a href="/mypage/main/">마이페이지</a></li>
+		</ul>
+
+	</div>
+
+  <!-- 좌측 gnb -->
+  <div id="gnb">
+
+    <!-- 프로필 -->
+    <div id="user_profile">
+      <div id="pimg">
+        <img src="{{ qb.img.url }}" alt="" />
+      </div>
+      <p id="uName">{{member.name}}</p>
+      <p id="uEmail">{{member.mail}}</p>
+    </div>
+
+    <!-- Nav -->
+    <nav id="menu">
+      <ul>
+        <a href="/main/index/"><li class="menu_item">우리 가족 이야기</li></a>
+        <a href="/diary/diaryHome/"><li class="menu_item active">다이어리</li></a>
+        <a href="/emotion/main/"><li class="menu_item">감정 돌아보기</li></a>
+        <a href="/family1/fam/"><li class="menu_item">우리가족</li></a>
+        <a href="/calendar1/cal/"><li class="menu_item">캘린더</li></a>
+        <a href="/customer/"><li class="menu_item">알려드려요</li></a>
+      </ul>
+    </nav>
+
+    <!-- logout -->
+    <div id="logout">
+      <a href="/main/logout/"><span>로그아웃</span></a>
+    </div>
+
+  </div>
+
+  <!-- 검색창 슬라이드 -->
+  <div id="s_overlay" class="s_overlay"></div>
+  <div id="main_search" class="search_bar closed">
+    <div id="input_wrap">
+      <form action="/main/search/" method="POST" name="searchFrm" id="searchFrm">
+        <div class="search_box">
+          {% csrf_token %}
+          <input type="text" id="csearch" placeholder="다이어리에서 찾고 싶은 내용을 입력하세요.">
+          <img src="/static/images/home/search_icon.png" alt="">
+        </div>
+      </form>
+        <button type="button" id="search_closeBtn">
+          <img src="/static/images/home/close_icon.png" alt="알림창닫기">
+        </button>
+    </div>
+      <div id="search_content">
+        <div id="search_result">
+        </div>
+        <div class="search_list">
+          <a>
+            <span class="s_title">찾고자 하는 일기를 검색해 보세요.</span>
+            <span class="s_date"></span>
+          </a>
+        </div>
+      </div>
+    </div>
+  
+  <!-- 알림창 슬라이드 -->
+  <div id="n_overlay" class="n_overlay"></div>
+  <div id="noti_side" class="sidebar closed">
+    <div class="noti_header">
+      <h2>알림</h2>
+      <button id="noti_closeBtn"><img src="/static/images/home/close_icon.png" alt="알림창닫기"></button>
+    </div>
+    <ul id="noti_list">
+      {% for notification in notifications %}
+      <li class="noti_list {% if notification.checked %}checked{% endif %}">
+          <a href="#">
+              <div>
+                  <img src="/static/images/home/default_profile.png" alt="프로필이미지">
+              </div>
+              <div>
+                  <p>{{ notification.message }}</p>
+                  <p class="noti_date">{{ notification.ndate|date:"Y-m-d H:i" }}</p>
+              </div>
+          </a>
+      </li>
+      {% empty %}
+      <li class="noti_list">
+          <p>새로운 알림이 없습니다.</p>
+      </li>
+      {% endfor %}
+  </ul>
+  </div>
+  <!-- 공통 상단좌측메뉴 -->
+
+
+  <!-- 메인 -->
+  <div id="container1">
+    <div id="diary_view_top">
+      <div class="diary_view_title">
+        <h2>{{cont.ctitle}}</h2>
+        <span>{{cont.cdate}}</span>
+        <span>{{cont.member.name}}</span>
+      </div>
+      {% comment %} {% if is_mdiary_list %} {% endcomment %}
+      <div id="modify_del_slide_1">
+        <img src="/static/images/diary/addBtn.png" alt="" id="openModal_1" style="cursor: pointer;"> <!-- 커서 포인터 추가 -->
+        <div class="sub_menu_modal" id="sub_menu_modal_1">
+          <div id="sub_menu_content">
+            <a href="/diary/dmodify/{{cont.cno}}"><button id="editButton_1">수정</button></a>
+            <button id="deleteButton_1" data-cno="{{ cont.cno }}">삭제</button>
+          </div>
+        </div>
+      </div>
+      {% comment %} {% endif %} {% endcomment %}
+    </div>
+    <div id="diary_content">
+      {% if cont.image %}
+      <img src="{{ cont.image.url }}" alt="Diary Image" name="image">
+      {% endif %}
+      <p style="width: 1052px;">
+        {{cont.ccontent}}
+      </p>
+    </div>
+    <div id="diary_list">
+      <table>
+        <colgroup>
+          <col style="width:15%;">
+          <col style="width:50%;">
+          <col style="width:15%;">
+          <col style="width:20%;">
+        </colgroup>
+        <tr>
+          <th colspan="4">{{mdiary.mtitle}}{{mdiary.gtitle}}</th>
+        </tr>
+        {% if content %}
+          {% for c in content %}
+          <tr>
+            <td>{{c.cno}}</td>
+            <td><a href="">{{c.ctitle}}</a></td>
+            <td>{{c.member.nicName}}</td>
+            <td>{{c.cdate|date:"y.m.d"}}</td>
+          </tr>
+          {% endfor %}
+        {% endif %}
+
+
+        <!-- 이전 글 -->
+        {% if previous_post %}
+        <tr>
+            <td>이전글</td>
+            <td>
+                <a href="/diary/diary_view/{{ previous_post.cno }}">{{ previous_post.ctitle }}</a>
+            </td>
+            <td>{{ previous_post.member.name }}</td>
+            <td>{{ previous_post.cdate|date:"Y.m.d" }}</td>
+        </tr>
+        {% endif %}
+
+        <!-- 다음 글 -->
+        {% if next_post %}
+        <tr>
+            <td>다음글</td>
+            <td>
+                <a href="/diary/diary_view/{{ next_post.cno }}">{{ next_post.ctitle }}</a>
+            </td>
+            <td>{{ next_post.member.name }}</td>
+            <td>{{ next_post.cdate|date:"Y.m.d" }}</td>
+        </tr>
+        {% endif %}
+        <tr id="listBtn">
+          <td colspan="4"><a href="/diary/{{diary}}List/">목록으로</a></td>
+        </tr> 
+      </table>
+      
+    </div>
+    {% if cont.group_diary.all %}
+      <div class="diary_react">
+        <div class="diary_like" data-cno="{{ cont.cno }}">
+          <img src="{% if user_liked %}/static/images/diary/Favorite_duotone.png{% else %}/static/images/diary/Favorite_light.png{% endif %}" alt="" class="like_click">
+          <span id="likecount">{{ like_count }}</span>  <!-- 좋아요 수 표시 -->
+        </div>
+        <div class="diary_comment">
+          <img src="/static/images/diary/Chat_alt_2_light.png" alt=""><span>댓글 {{comments.count}}</span>
+        </div>
+      </div>
+    {% for comment, profile1 in comments %}
+    <div id="comment">
+      <div id="comment_view">
+        <div class="profile_img">
+          <img src="{{profile1.url}}" alt="">
+        </div>
+        <div class="comment_detail">
+          <div class="comment_name">{{ comment.member.name }}</div>
+          <div class="comment_date">{{ comment.created_at|date:"Y.m.d H:i:s" }}</div>
+        </div>
+        <div id="modify_del_slide_2">
+          {% if request.session.session_id == comment.member.id %}
+          <img src="/static/images/diary/addBtn.png" alt="" class="openModal" data-comment-id="{{ comment.id }}" style="cursor: pointer;">
+          <div class="c_modal" id="c_modal_{{ comment.id }}">
+            <div id="sub_menu_content">
+              <form method="POST" action="{% url 'comment:delete_comment' comment.id %}">
+                {% csrf_token %}
+                <button type="button" class="delBtn" data-comment-id="{{ comment.id }}">삭제</button>
+              </form>
+            </div>
+          </div>
+          {% endif %}
+          </div>
+        </div>
+        <div class="comment_content">
+          <span>{{ comment.text }}</span>
+        </div>
+        
+      </div>
+      {% endfor %}
+      
+      {% if request.GET.comment_success %}
+        <script>
+            alert("댓글이 등록되었습니다.");
+        </script>
+      {% endif %}
+
+      
+      <div class="comment_regist">
+        <form id="comment-form" action="{% url 'diary:add_comment' cont.cno %}" method="POST">
+          {% csrf_token %}
+          <textarea name="comment_text" placeholder="댓글을 달아보세요." required></textarea>
+          <button type="submit">등록</button>
+        </form>
+      </div>
+      {% endif %}
+      
+  </div>
+
+  <script>
+    // 삭제 버튼 클릭 시
+    document.querySelectorAll('.delBtn').forEach(function (button) {
+      button.addEventListener('click', function(event) {
+        event.preventDefault();  // 기본 폼 제출을 막고, 자바스크립트로 처리
+  
+        // 클릭된 버튼에서 댓글 ID를 가져옴
+        var commentId = this.getAttribute('data-comment-id');
+        // 댓글 내용 가져오기
+        var commentText = this.closest('#comment').querySelector('.comment_content span').textContent;
+        
+        // 콘솔에 ID와 댓글 내용 출력
+        console.log('삭제할 댓글 ID:', commentId); 
+        console.log('댓글 내용:', commentText);  // 댓글 내용도 콘솔에 출력
+  
+        // 삭제 확인 알림
+        if (confirm("댓글을 삭제하시겠습니까?")) {
+  
+          // AJAX를 사용하여 댓글 삭제 요청을 보냄
+          var xhr = new XMLHttpRequest();
+          xhr.open("POST", "{% url 'comment:delete_comment' 0 %}".replace('0', commentId), true);
+          xhr.setRequestHeader('X-CSRFToken', '{{ csrf_token }}');  // CSRF 토큰을 헤더에 추가
+          
+          xhr.onreadystatechange = function() {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+              if (xhr.status === 200) {
+                alert('댓글이 삭제되었습니다.');
+                // 현재 URL에서 `comment_success` 제거
+                const url = new URL(window.location.href); // 현재 URL 가져오기
+                url.searchParams.delete('comment_success'); // `comment_success` 파라미터 제거
+                window.history.replaceState({}, '', url); // URL을 변경하지만 페이지는 새로고침하지 않음
+
+                location.reload(); // 페이지 새로고침
+              } else {
+                alert('댓글 삭제에 실패했습니다.');
+              }
+            }
+          };
+  
+          xhr.send();
+        } else {
+        }
+      });
+    });
+  </script>
+
+  <script>
+    // 모달 열기
+    document.querySelectorAll('.openModal').forEach(function (element) {
+      element.addEventListener('click', function() {
+          // 이미 열려있는 모달을 닫기
+          document.querySelectorAll('.c_modal').forEach(function(modal) {
+              modal.style.display = 'none';
+          });
+          // 현재 클릭한 댓글의 ID 가져오기
+          var commentId = this.getAttribute('data-comment-id');
+          var modal = document.getElementById('c_modal_' + commentId); // 해당 댓글의 모달 찾기
+          console.log('Comment ID:', commentId);
+          console.log('Modal Element:', modal);
+
+          // 해당 모달 열기
+          modal.style.display = 'block';
+      });
+    });
+
+    // 모달 외부 클릭 시 닫기
+    window.addEventListener('click', function(e) {
+      // 모달을 제외한 다른 곳을 클릭했을 경우
+      if (!e.target.closest('.c_modal') && !e.target.closest('.openModal')) {
+          document.querySelectorAll('.c_modal').forEach(function(modal) {
+              modal.style.display = 'none';
+          });
+      }
+    });
+
+    // 모달 닫기
+    document.querySelectorAll('.closeModal').forEach(function (element) {
+      element.addEventListener('click', function() {
+          var commentId = this.getAttribute('data-comment-id');
+          var modal = document.getElementById('c_modal_' + commentId);
+          modal.style.display = 'none';
+      });
+    });
+
+    // 좋아요
+    document.querySelector('.like_click').addEventListener('click', function() {
+      const cno = this.closest('.diary_like').getAttribute('data-cno');
+      fetch(`/like/${cno}/`, {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+              'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+          },
+          body: JSON.stringify({
+              'cno': cno
+          })
+      })
+      .then(response => response.json())
+      .then(data => {
+          if (data.success) {
+              const likeImage = document.querySelector('.like_click');
+              likeImage.src = data.liked ? '/static/images/diary/Favorite_duotone.png' : '/static/images/diary/Favorite_light.png';
+              document.querySelector('.diary_like span').textContent = data.like_count;
+            }
+        });
+    });
+  </script>
+
+
+  <script>
+    // 첫 번째 모달 열기/닫기
+    document.getElementById('openModal_1').addEventListener('click', function() {
+      var modal = document.getElementById('sub_menu_modal_1');
+      console.log('첫 번째 모달 클릭됨');
+      modal.classList.toggle('open'); // open 클래스가 있으면 제거, 없으면 추가
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+      // 삭제 버튼 클릭 이벤트 위임
+      document.body.addEventListener('click', function (event) {
+        if (event.target.id === 'deleteButton_1') { // 삭제 버튼인지 확인
+          const cno = event.target.dataset.cno; // 게시글 번호 가져오기 (data-* 속성 활용)
+  
+          if (confirm('정말 삭제하시겠습니까?')) { // 확인창 띄우기
+            fetch(`/diary/ddelete/${cno}/`, {
+              method: 'POST',
+              headers: {
+                'X-CSRFToken': '{{ csrf_token }}', // CSRF 토큰 추가
+              },
+            })
+              .then(response => response.json())
+              .then(data => {
+                if (data.status === 'success') {
+                  alert(data.message); // 성공 메시지
+                  window.location.href = '/diary/MdiaryList/'; // 목록 페이지로 이동
+                } else {
+                  alert(data.message); // 실패 메시지
+                }
+              })
+              .catch(error => {
+                console.error('Error:', error);
+                alert('삭제에 실패했습니다. 다시 시도해주세요.');
+              });
+            } else {
+              console.log('삭제 취소');
+            }
+          }
+        });
+      });
+      
+  </script>
+
+</body>
+</html>

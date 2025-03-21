@@ -1,0 +1,85 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="{% static 'css/admin1/admin_notiWrite.css'%}">
+<link rel="stylesheet" href="{% static 'css/admin1/admin_login.css'%}">
+<script  src="http://code.jquery.com/jquery-latest.min.js"></script>
+
+<script>
+	if('{{request.session.session_role}}'=='1'){
+		alert("접근 권한이 없습니다.")
+		location.href = '/admin1/admin_memList/'
+	}
+	$(function(){
+		$("#a_logout").click(function(){
+			if(confirm("로그아웃 하시겠습니까?")){
+				location.href='/admin1/logout/'
+			}
+		})
+		$("#lBtn").click(function(){
+			location.href = '/admin1/admin_noticeList/'
+		})
+		$("#delBtn").click(function(){
+			if(confirm("게시글을 삭제하시겠습니까?")){
+				location.href = '/admin1/admin_notiDelete/{{noti.bno}}/'
+			}
+		})
+	})
+
+</script>
+
+<title>공지사항</title>
+
+</head>
+
+<body>
+	<nav class="gnb">
+		<a href="#" class="logo"><img src="/static/images/admin1/logo_sample.png" alt=""></a>
+		<div class="menu">
+			<a href="/admin1/admin_memList/">회원관리</a>
+			<a href="#">판매관리</a>
+			<a href="/admin1/admin_noticeList/" class='active'>공지사항</a>
+			<a href="/admin1/admin_postList/">포스트</a>
+			<a href="/admin1/admin_qList/" >1:1문의</a>
+			<a href="/admin1/admin_adminList/">관리자설정</a>
+			<a id='a_logout'>로그아웃</a>
+		</div>
+	</nav>
+	<div class="container">
+		<div class="con_header">
+			<h2>공지사항</h2>
+		</div>
+		<div id="view_wrap">
+			<table>
+				<tr class="first_row">
+					<td colspan='2'>{{noti.btitle}}</td>
+				</tr>
+				<tr class='info_row'>
+					<td colspan='2'>등록일 : {{noti.bdate}}&nbsp&nbsp&nbsp&nbsp작성자 : {{noti.member.name}}</td>
+				</tr>
+				<tr>
+					<td colspan="2" class='content'>
+						{{noti.bcontent}}
+						<br>
+						{% if noti.bfile %}
+						<img src="{{noti.bfile.url}}" alt="{{noti.bfile}}">
+						{% endif %}
+					</td>
+				</tr>
+				<tr>
+					<td colspan="2"><strong>다음글</strong> <span class="separator">|</span><a href="/admin1/admin_notiView/{{next_board.bno}}/">&nbsp{{next_board.btitle}}</a></td>
+				</tr>
+				<tr>
+					<td colspan="2"><strong>이전글</strong> <span class="separator">|</span><a href="/admin1/admin_notiView/{{prev_board.bno}}/">&nbsp{{prev_board.btitle}}</a></td>
+				</tr>
+			</table>
+			<button type='button' id='lBtn'>목록</button>
+			<button type='button' id='delBtn' style='color:red;'>삭제</button>
+		</div>
+	</div>
+	
+</body>
+</html>

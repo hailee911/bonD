@@ -1,0 +1,435 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="csrf-token" content="{{ csrf_token }}">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="{% static 'css/home/main.css'%}">
+  <link rel="stylesheet" href="{% static 'css/emotion/report.css'%}">
+
+  <link rel="stylesheet" as="style" crossorigin
+    href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
+  
+  <script src="http://code.jquery.com/jquery-latest.min.js"></script>
+  <title>감정 돌아보기</title>
+  <style>
+    pre {
+      white-space: pre-wrap; /* 자동 줄 바꿈 */
+      word-wrap: break-word; /* 긴 단어는 줄바꿈 */
+      background-color: #f4f4f4; /* 배경색 */
+      padding: 20px;
+      border-radius: 5px;
+    }
+  </style>
+  
+  <script>
+    $(function() {
+      // GNB 클릭
+      $('#menu ul li').on('click', function() {
+        $('#menu ul li').removeClass('active');
+        $(this).addClass('active');
+      });
+  
+      // 검색창
+      $('#searchBtn').click(function(){
+        $("#main_search").removeClass('closed').addClass('open');
+        $('#s_overlay').addClass('show');
+      });
+    $('#search_closeBtn').click(function(){
+      $("#main_search").removeClass('open').addClass('closed');
+      $('#s_overlay').removeClass('show');
+    });
+    $('#s_overlay').click(function() { //배경 클릭하면 닫히게
+      $('#main_search').removeClass('open').addClass('closed');
+      $('#s_overlay').removeClass('show');
+    });
+    // 검색창 검색기능
+    $('.search_box input').on('keypress', function(event){
+      if (event.key == 'Enter') {
+        event.preventDefault(); // 기본 제출 방지
+        // 입력값과 일치하는 일기 찾기
+        ctitle = "{{Content.ctitle}}"
+        cdate = "{{Content.cdate}}"
+        ccontent = "{{Content.ccontent}}"
+        cno = "{{Content.cno}}"
+        //ajax 구문
+        $.ajax({
+          headers:{"X-CSRFToken":$("meta[name='csrf-token']").attr("content")},
+          url:"/main/search/",
+          type:"post",
+          data:{"csearch":$("#csearch").val()}, //views.py데이터 보냄
+          success:function(data){
+            //data -> 넘어온 검색결과
+            console.log("리스트 : "+data.list_qs)
+            console.log("리스트 : "+data.list_qs[0])
+            console.log("리스트개수 : "+data.list_qs.length)
+            //html보내는 부분
+            var hdata = ""
+            // 검색 결과가 있을 경우
+            if (data.list_qs.length > 0){
+              hdata += `<div id="search_result">검색 결과 <span>(${data.list_qs.length})</span></div>`
+              for(var i=0;i<data.list_qs.length;i++){
+                // cdate를 Date 객체로 변환 > 0년0월0일로 형식 변환
+                var cdate = new Date(data.list_qs[i].cdate);
+                var formattedDate = cdate.getFullYear() + "년 " + (cdate.getMonth() + 1) + "월 " + cdate.getDate() + "일";
+                hdata += `<div class="search_list"><a href="/diary/diary_view/${data.list_qs[i].cno}/" class="result-item">
+                  <span class="s_title"> ${data.list_qs[i].ctitle}</span>
+                  <span class="s_date">${formattedDate}</span>
+                  <img src="/static/images/home/right.png" alt="">
+                  </a>
+                  </div>`;
+                  }
+            }else{
+              // 검색 결과가 없을 경우
+              hdata += `<div id="search_result">검색 결과 <span>(${data.list_qs.length})</span></div>`
+              hdata += `<div class="search_list"><a>
+                <span class="s_title">검색하신 내용과 일치하는 결과가 없어요.</span>
+                <span class="s_date"></span>
+              </a></div>`;
+            }
+                $("#search_content").html(hdata);
+              },
+              error:function(){
+                alert("에러")
+              }
+            })
+          }
+      });
+  
+    });
+  
+    // -------------알림창-----------------
+    $(function() {
+      // 페이지 로드 시 알림 상태 확인
+      fetchNotifications();
+  
+      // 알림창 열기
+      $('#notiBtn').click(function() {
+          $('#noti_side').removeClass('closed').addClass('open');
+          $('#n_overlay').addClass('show');
+  
+          // 알림 데이터 가져오기
+          fetchNotifications();
+      });
+  
+      // 알림창 닫기
+      $('#noti_closeBtn, #n_overlay').click(function() {
+          $('#noti_side').removeClass('open').addClass('closed');
+          $('#n_overlay').removeClass('show');
+      });
+  
+      // 알림 데이터 가져오는 함수
+      function fetchNotifications() {
+          $.ajax({
+              url: '/main/notification/', // 알림 데이터를 가져올 URL
+              method: 'GET',
+              success: function(data) {
+                  let hasUnread = false; // 읽지 않은 알림 여부
+                  let hdata = ""; // 알림 내용을 담을 HTML
+  
+                  if (data.notifications.length > 0) {
+                      data.notifications.forEach(function(notification) {
+                          if (!notification.checked) {
+                              hasUnread = true; // 읽지 않은 알림 존재
+                          }
+                          hdata += `
+                              <li class="noti_list ${notification.checked ? 'checked' : ''}" data-id="${notification.id}">
+                                  <a>
+                                      <div>
+                                          <img src="/static/images/home/default_profile.png" alt="프로필이미지">
+                                      </div>
+                                      <div>
+                                          <p>${notification.message}</p>
+                                          <p class="noti_date">${notification.ndate}</p>
+                                      </div>
+                                  </a>
+                              </li>
+                          `;
+                      });
+                  } else {
+                      hdata = `
+                          <li class="noti_list">
+                              <p>새로운 알림이 없습니다.</p>
+                          </li>
+                      `;
+                  }
+  
+                  $('#noti_list').html(hdata); // 알림 UI 업데이트
+  
+                  // 빨간 점 표시
+                  if (hasUnread) {
+                      $('#notiBtn .notification-dot').show(); // 읽지 않은 알림이 있으면 빨간 점 표시
+                  } else {
+                      $('#notiBtn .notification-dot').hide(); // 없으면 숨김
+                  }
+              },
+              error: function(error) {
+                  console.error('Error fetching notifications:', error);
+              }
+          });
+      }
+  
+      // 알림 리스트 클릭 시 배경색 변경 및 읽음 처리
+      $('#noti_list').on('click', '.noti_list', function () {
+          const notificationId = $(this).data('id'); // 알림 ID 가져오기
+  
+          if (notificationId) {
+              $(this).addClass('read'); // 읽음 상태로 변경
+              $(this).css('background-color', 'white'); // 즉시 배경색 변경
+  
+              // 서버에 읽음 상태 동기화 요청
+              markNotificationAsRead(notificationId);
+          }
+      });
+  
+      // 알림 읽음 처리 함수
+      function markNotificationAsRead(notificationId) {
+          $.ajax({
+              url: `/main/notification_read/${notificationId}/`, // 알림 읽음 처리 URL
+              method: 'POST',
+              headers: { 'X-CSRFToken': $("meta[name='csrf-token']").attr("content") },
+              success: function () {
+                  console.log('Notification marked as read.');
+                  // 읽음 상태 업데이트 후 빨간 점 재확인
+                  fetchNotifications();
+              },
+              error: function (error) {
+                  console.error('Error marking notification as read:', error);
+              }
+          });
+      }
+  
+      // 5초마다 읽지 않은 알림 상태 확인
+      setInterval(fetchNotifications, 5000);
+  });
+  </script>
+</head>
+
+<body>
+	<!-- 최상단 메뉴 -->
+	<div id="top_nav">
+		<h1><a href="/main/index/"></a></h1>
+		<ul class="top_menu">
+			<li><a id="searchBtn"><img src="/static/images/home/search_icon.png" alt=""></a></li>
+			<li>
+				<a id="notiBtn">
+						<img src="/static/images/home/bell_off_icon.png" alt="">
+						<span class="notification-dot"></span> <!-- 빨간점을 표시할 요소 추가 -->
+				</a>
+		</li>
+			<li><a href="/mypage/main/">마이페이지</a></li>
+		</ul>
+
+	</div>
+  <!-- 좌측 gnb -->
+  <div id="gnb">
+
+    <!-- 프로필 -->
+    <div id="user_profile">
+      <div id="pimg">
+        <img src="{{ qb.img.url }}" alt="" />
+      </div>
+      <p id="uName">{{member.name}}</p>
+      <p id="uEmail">{{member.mail}}</p>
+    </div>
+
+    <!-- Nav -->
+    <nav id="menu">
+      <ul>
+        <a href="/main/index/"><li class="menu_item">우리 가족 이야기</li></a>
+        <a href="/diary/diaryHome/"><li class="menu_item">다이어리</li></a>
+        <a href="/emotion/main/"><li class="menu_item active">감정 돌아보기</li></a>
+        <a href="/family1/fam/"><li class="menu_item">우리가족</li></a>
+        <a href="/calendar1/cal/"><li class="menu_item">캘린더</li></a>
+        <a href="/customer/"><li class="menu_item">알려드려요</li></a>
+      </ul>
+    </nav>
+
+    <!-- logout -->
+    <div id="logout">
+      <a href="/main/logout/"><span>로그아웃</span></a>
+    </div>
+
+  </div>
+
+  <!-- 검색창 슬라이드 -->
+  <div id="s_overlay" class="s_overlay"></div>
+  <div id="main_search" class="search_bar closed">
+    <div id="input_wrap">
+      <form action="/main/search/" method="POST" name="searchFrm" id="searchFrm">
+        <div class="search_box">
+          {% csrf_token %}
+          <input type="text" id="csearch" placeholder="다이어리에서 찾고 싶은 내용을 입력하세요.">
+          <img src="/static/images/home/search_icon.png" alt="">
+        </div>
+      </form>
+        <button type="button" id="search_closeBtn">
+          <img src="/static/images/home/close_icon.png" alt="알림창닫기">
+        </button>
+    </div>
+      <div id="search_content">
+        <div id="search_result">
+        </div>
+        <div class="search_list">
+          <a>
+            <span class="s_title">찾고자 하는 일기를 검색해 보세요.</span>
+            <span class="s_date"></span>
+          </a>
+        </div>
+      </div>
+    </div>
+  
+  <!-- 알림창 슬라이드 -->
+  <div id="n_overlay" class="n_overlay"></div>
+  <div id="noti_side" class="sidebar closed">
+    <div class="noti_header">
+      <h2>알림</h2>
+      <button id="noti_closeBtn"><img src="/static/images/home/close_icon.png" alt="알림창닫기"></button>
+    </div>
+    <ul id="noti_list">
+      {% for notification in notifications %}
+      <li class="noti_list {% if notification.checked %}checked{% endif %}">
+          <a href="#">
+              <div>
+                  <img src="/static/images/home/default_profile.png" alt="프로필이미지">
+              </div>
+              <div>
+                  <p>{{ notification.message }}</p>
+                  <p class="noti_date">{{ notification.ndate|date:"Y-m-d H:i" }}</p>
+              </div>
+          </a>
+      </li>
+      {% empty %}
+      <li class="noti_list">
+          <p>새로운 알림이 없습니다.</p>
+      </li>
+      {% endfor %}
+  </ul>
+  </div>
+
+  <!-- container -->
+  <div id="container_report">
+    <span id="main_title">내 감정 돌아보기</span>
+    <div id="sub_title">
+      <h1>AI 감정 분석 리포트</h1>
+      <h3>{{member.name}} 님의 최근 일주일의 기록을 바탕으로 AI가 분석한 감정 리포트를 보여드릴게요.</h3>
+      <h4><strong>AI 감정 분석 리포트</strong> 란?</h4>
+      <h5>사용자의 기록 내용에서 감정의 점수를 매겨 기록 속의 MBTI와 LBTI를 분석해요. 그 후 사용자의 실제 MBTI에 기반하여<br>
+        환경과 맥락에 따라 사용자의 MBTI가 일기속 내용을 바탕으로 AI가 예측하는 MBTI와 비교해 보다 더 깊은 본인 통찰력을 제공해 드려요.<br>
+        AI 분석은 재미로 가볍게 참고하는 정도로 보시는 걸 추천드려요! 😊</h5>
+    </div>
+
+    <div id="report_container">
+      <div id="mbtitle">
+        <span>AI 감정 분석하는 방법</span>
+        <p>1. 먼저 작성된 일기가 있는지 확인해주세요! (일기가 없으면 리포트를 만들 수 없어요)</p>
+        <p>2. 일기 텍스트로 저장 버튼을 눌러주세요.</p>
+        <p>3. 나의 MBTI를 선택한 후</p>
+        <p>4. 분석시작 버튼을 클릭해주세요!</p>
+      </div>
+      <div>
+
+        <form action="{% url 'emotion:save_diaries_to_txt' %}" method="get">
+          <button type="submit" id="txtBtn">일기 텍스트로 저장</button>
+        </form>
+        <form method="GET" action="{% url 'emotion:run_ai_process' %}">
+          <div id="select_mbti">
+            <select class="mbti" name="mbti">
+              <option value="select">선택</option>
+              <option value="ISTJ">ISTJ</option>
+              <option value="ISFJ">ISFJ</option>
+              <option value="INFJ">INFJ</option>
+              <option value="INTJ">INTJ</option>
+              <option value="ISTP">ISTP</option>
+              <option value="ISFP">ISFP</option>
+              <option value="INFP">INFP</option>
+              <option value="INTP">INTP</option>
+              <option value="ESTP">ESTP</option>
+              <option value="ESFP">ESFP</option>
+              <option value="ENFP">ENFP</option>
+              <option value="ENTP">ENTP</option>
+              <option value="ESTJ">ESTJ</option>
+              <option value="ESFJ">ESFJ</option>
+              <option value="ENFJ">ENFJ</option>
+              <option value="ENTJ">ENTJ</option>
+            </select>
+            <button type="submit" id="aiBtn">분석시작</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div id="report_main">
+      <span>AI 감정 분석 리포트</span>
+      <hr color="#D9D9D9">
+      <div id="report_txt">
+        {% if content %}
+          <div>
+              <h2>분석 결과:</h2><br>
+              <pre>{{ content }}</pre>  <!-- 분석된 AI 결과 출력 -->
+          </div>
+        {% elif error %}
+          <div style="color: red;">
+              <p>{{ error }}</p>  <!-- 오류 메시지 출력 -->
+          </div>
+        {% else %}
+          <h2>💥주의 필독💥</h2>
+          <p>AI 분석이 아직 실행되지 않았습니다. 일기를 텍스트로 저장 후, MBTI를 선택 후 분석 시작 버튼을 <strong>한 번만</strong> 눌러주세요.<br> <strong>처리 시간이 조금 걸릴 수도 있습니다. 조금만 기다려 주세요!</strong><br>
+            ❗새로고침을 하거나 페이지를 나가면 분석 결과가 초기화되어 결과가 바뀔 수도 있습니다.
+            <br><strong>( 이후 이전 결과는 다시 볼 수 없습니다. 💦)</strong></p>
+        {% endif %}
+
+      </div>
+    </div>
+    <div id="bottom">
+      <span>상기 리포트 AI가 작성한 것으로 일상생활에서의 참고용 정도로만 봐주세요.</span>
+      <button type="button">다운로드</button>
+    </div>
+  </div>
+
+  <!-- footer -->
+
+  <script >
+    // 페이지 로딩 시 AJAX 요청을 보내서 데이터 받기
+    $.ajax({
+      url: "/emotion/report/",  // '/emotion/report/' 경로로 요청
+      type: "GET",
+      success: function(response) {
+          if (response.content) {
+              // 응답받은 content 데이터 표시
+              $('#result').text(response.content);
+          } else {
+              $('#result').text('결과를 가져오려면 분석 시작 버튼을 클릭해주세요.');
+          }
+      },
+      error: function() {
+          $('#result').text('서버 오류가 발생했습니다.');
+      }
+  });
+
+  </script>
+
+  <script>
+    $(document).ready(function() {
+        // '일기 텍스트로 저장' 버튼 클릭 시
+        $('#txtBtn').on('click', function(event) {
+            $(this).closest('form').submit();
+        });
+      });
+  </script>
+
+
+  {% if messages %}
+        <script>
+            {% for message in messages %}
+                alert('{{ message }}');
+            {% endfor %}
+        </script>
+    {% endif %}
+
+
+</body>
+
+</html>

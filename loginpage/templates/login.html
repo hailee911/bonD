@@ -1,0 +1,68 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>로그인 페이지</title>
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
+  <link rel="stylesheet" href="{% static '/css/login/join1.css'%}">
+  <script  src="http://code.jquery.com/jquery-latest.min.js"></script>
+  <script>
+    // 엔터 키 입력 감지
+    $(document).on('keydown', function(event) {
+      if (event.key === 'Enter') {
+        console.log('엔터키눌림');
+        $('#login_button').click(); // 로그인 버튼 클릭 이벤트 실행
+      }
+    });
+  </script>
+</head>
+<body>
+  <div class="container">
+    <div class="image-section">
+      <img src="{% static '/images/login/join_login_index.svg'%}" alt="">
+    </div>
+    <div class="join_form">
+      <div id="login_h1">
+        <div id="login_h2">오늘 하루는 어땠나요?<br>당신의 하루를 알려주세요.</div>
+        <div class="signup-link">
+          계정이 없으신가요? <br>
+          <a href="/loginpage/join01/">회원가입</a>
+        </div>
+      </div>
+      
+      <form action="{% url 'loginpage:login' %}" method="POST" name="loginFrm">
+        {% csrf_token %}
+        <label for="id" id="id_label">아이디</label>
+        <input type="text" name="id" id="id_input" placeholder="아이디를 입력해주세요.  ">
+        <label for="password" id="pw_label">비밀번호</label>
+        <input type="password" name="pw" id="pw_input" placeholder="비밀번호를 입력해주세요.">
+        <div class="checkbox">
+          <input type="checkbox" id="remember" name="remember">
+          <label for="remember">아이디 기억</label>
+          <div>
+            <label for="id_remember"><a href='/loginpage/id/'>아이디를 잊었어요.</a></label>
+            <label for="pw_remember"><a href='/loginpage/pw/'>비밀번호를 잊었어요.</a></label>
+          </div>
+        </div>
+        <div class="login_error-message" id="login_errorMessage1">아이디를 입력해주세요</div>
+        <div class="login_error-message" id="login_errorMessage2">비밀번호를 입력해주세요</div>
+        {% if lmsg %}  
+          <div id="login_errorMessage3">{{ lmsg }}</div>
+        {% endif %}
+        <button type="button" id="login_button">로그인</button>
+      </form>
+      <div class="alternative-login">
+        <p>또는</p>
+        <div class="login_icons">
+          <a href="#"><img src="{% static '/images/login/google-icon.png'%}" alt="Google"></a>
+          <a href="#"></a><img src="{% static '/images/login/naver-icon.png'%} " alt="Naver"></a>
+          <a href="#"></a><img src="{% static '/images/login/kakao-icon.png'%}" alt="Kakao"></a>
+        </div>
+      </div>
+      <script src="{% static '/js/login/login.js'%}"></script>
+    </div>
+  </div>
+</body>
+</html>

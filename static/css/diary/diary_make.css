@@ -1,0 +1,185 @@
+*{
+  margin:0; padding:0; 
+  font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
+  font-variant-numeric: tabular-nums;
+}
+
+a{
+  text-decoration: none; 
+  color:inherit
+}
+
+#all_area{
+  width:1617px; 
+  height:1080px;
+  margin-left:284px;
+}
+
+#title_area{
+  display: flex;
+  width:1617px;
+  height: 130px;
+  padding-top: 60px;
+  display: flex;
+}
+
+#topTit{
+  width: 500px;
+  font-size: 22px;
+  font-weight: 500;
+  padding-top: 50px;
+  padding-left: 40px;
+  /* display: flex; */
+}
+
+#main_area{
+  position: relative;
+  display: flex;
+  width: 1617px;
+  height: 700px;
+  /* border: 1px solid black; */
+  /* align-items: center; */
+  /* justify-content: center; */
+  /* overflow: hidden; */
+  /* background-color: #eeeeee; */
+}
+
+.container {
+  display: flex;
+  padding-left: 80px;
+  padding-top: 30px;
+  box-sizing: border-box;
+  /* position: relative; */
+  /* width: 460px;
+  padding-right: 500px; */
+}
+
+#diaryImg {
+  width: 414px; /* 컨테이너 크기에 맞게 이미지 크기 조정 */
+  height: 578px; /* 이미지 비율 유지 */
+  /* display: block; 아래 요소와 겹치지 않도록 */
+}
+
+.title_container{
+  margin-top: 20px;
+  margin-left: 50px;
+}
+
+.title_input {
+  /* position: absolute;
+  top: 60px;
+  left: 530px; */
+  width: 350px;
+  height: 40px;
+  border: 1px solid #DDDDDD;
+  border-radius: 10px;
+  /* border-bottom: 1px solid #000; */
+  background: transparent;
+  font-size: 17px;
+  font-weight: 500;
+  padding: 0 16px;
+  box-sizing: border-box;
+  outline: none;
+  z-index: 10;
+  margin-top: 10px;
+}
+
+textarea {
+  resize: none;
+}
+
+#groupName{
+  margin-top: 40px;
+}
+
+.gName_container{
+  display: flex; /* Flexbox 활성화 */
+  align-items: center; /* 세로 가운데 정렬 */
+  justify-content: center; /* 가로 가운데 정렬 */
+  gap: 10px; /* 입력창과 버튼 사이 간격 */
+}
+
+.familyName{
+  flex: 1;
+  width: 200px;
+  height: 34px;
+  padding: 14px 14px;
+  box-sizing: border-box;
+  font-size: 15px;
+  border: 1px solid #DDDDDD;
+  border-radius: 5px;
+  background: url('/diary_make/images/search.png') no-repeat;
+  background-position: center;
+  margin-top: 10px;
+}
+
+#mem_search{
+  margin-top: 40px;
+}
+
+.search_container {
+  display: flex; /* Flexbox 활성화 */
+  align-items: center; /* 세로 가운데 정렬 */
+  justify-content: center; /* 가로 가운데 정렬 */
+  gap: 10px; /* 입력창과 버튼 사이 간격 */
+}
+
+.searchBar{
+  flex: 1;
+  width: 200px;
+  height: 34px;
+  padding: 14px 14px;
+  box-sizing: border-box;
+  font-size: 15px;
+  border: 1px solid #DDDDDD;
+  border-radius: 5px;
+  background: url('/diary_make/images/search.png') no-repeat;
+  background-position: center;
+  margin-top: 10px;
+  /* position: absolute;
+  top: 180px;
+  left: 530px; */
+}
+
+#date_search{
+  margin-top: 40px;
+}
+
+.date_input{
+  height: 28px;
+  margin-top: 10px;
+  border: 1px solid #DDDDDD;
+  font-size: 14px;
+}
+
+#memberList {
+  margin-top: 16px;
+  display: flex; /* 플렉스 레이아웃으로 변경 */
+  gap: 10px; /* 닉네임 간의 간격 */
+  flex-wrap: wrap; /* 공간이 부족하면 다음 줄로 이동 */
+}
+
+.nicName {
+  font-size: 16px;
+  margin: 5px 0;
+  color: #398FD6;
+  display: inline-block; /* 개별 닉네임을 블록처럼 표시 */
+  padding: 5px 10px; /* 패딩 추가 */
+  background-color: #f2f2f2; /* 배경색 */
+  border-radius: 5px; /* 모서리 둥글게 */
+}
+
+#save_area{
+  margin-top: 40px;
+}
+
+#save_area button{
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+#cancleBtn{
+  margin-left: 10px;
+}
+

@@ -1,0 +1,59 @@
+* {
+	margin: 0;
+	padding: 0;
+	font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
+}
+.container{
+	width: 100%;
+	padding: 40px 40px 0 40px;
+	box-sizing: border-box;
+}
+
+.con_header{
+	display: flex;
+	gap: 10px;
+}
+.con_header h2{
+	margin-right: 1520px;
+}
+.con_header button{
+	width: 80px;
+}
+#dBtn{
+	color: rgb(235, 55, 0);
+}
+
+table {
+	width: 100%;
+	border-collapse: collapse;
+	margin-top: 20px;
+}
+table th, table td {
+	border: 1px solid #ddd;
+	padding: 10px;
+	text-align: left;
+}
+table th {
+	background-color: #f4f4f4;
+	font-weight: 500;
+}
+table td {
+	font-weight: 400;
+}
+#select_all{
+	width: 14px;
+}
+table tr:nth-child(even) {
+	background-color: #f9f9f9;
+}
+table tr:hover {
+	background-color: #f1f1f1;
+}
+.member_name a {
+	text-decoration: none;
+	color: #007bff;
+	transition: color 0.3s;
+}
+.member_name a:hover {
+	color: #0056b3;
+}

@@ -1,0 +1,179 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" as="style" crossorigin
+        href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.8/dist/web/static/pretendard.css" />
+    <link rel="stylesheet" href="{% static 'css/land_pg/land.css'%}">
+    <title>landing</title>
+</head>
+
+<body>
+    <script>
+        //슬라이드 애니메이션 함수 시작
+        document.addEventListener("DOMContentLoaded", () => {
+            const slideContainer = document.querySelector(".slide-container");
+            const slides = document.querySelectorAll(".slide");
+            const totalSlides = slides.length;
+
+            let currentIndex = 0;
+
+            // 클론된 첫 번째 슬라이드를 마지막에 추가 (무한 슬라이드 효과를 위해)
+            const firstSlide = slides[0].cloneNode(true);
+            slideContainer.appendChild(firstSlide);
+
+            // 초기 슬라이드 상태 (첫 번째 슬라이드는 오른쪽에서 나옴)
+            slideContainer.style.transform = `translateX(100%)`;
+
+            // 슬라이드를 오른쪽으로 이동시키는 함수
+            function goToSlide(index) {
+                slideContainer.style.transition = "transform 1s ease-in-out";
+                slideContainer.style.transform = `translateX(-${index * 100}%)`;
+            }
+
+            // 슬라이드를 한 칸 넘기는 함수
+            function nextSlide() {
+                currentIndex++;
+                if (currentIndex === totalSlides) {
+                    currentIndex = 0; // 마지막 슬라이드에서 첫 번째 슬라이드로 돌아가기
+                    slideContainer.style.transition = "none"; // 전환 없이 이동
+                    slideContainer.style.transform = `translateX(0)`;
+
+                    setTimeout(() => {
+                        slideContainer.style.transition = "transform 1s ease-in-out"; // 전환 효과 다시 활성화
+                        goToSlide(currentIndex);
+                    }, 50); // 잠시 후에 전환 효과 재적용
+                } else {
+                    goToSlide(currentIndex);
+                }
+            }
+            // 5초마다 슬라이드 전환
+            setInterval(nextSlide, 5000);
+            // 초기 상태
+            goToSlide(currentIndex);
+        }); //슬라이드 애니메이션 함수
+    </script>
+
+    <!-- header -->
+	<div id="land_header">
+        <h1><a href="#"></a></h1>
+		<ul class="land_menu">
+            <li style="margin-top: 5px;"><a href="/main/index/"><img src="/static/images/land_pg/logo_sample.png" alt=""></a></li>
+			<li><button type="button"><a href="/loginpage/join01/">회원가입</a></button></li>
+			<li><button type="button"><a href="/loginpage/login">로그인</a></button></li>
+		</ul>
+	</div>
+
+
+    <!-- main -->
+    <div id="main">
+        <div class="slide-container">
+            <!-- 슬라이드 1 -->
+            <div class="slide">
+                <img src="{% static 'images/land_pg/Group 35103.svg'%}" alt="슬라이드 1">
+                <div class="text01">
+                    <h1>감정의 흐름이 궁금하시죠?<br>서로의 감정을 알아보아요</h1>
+                    <h3>한눈에 확인할 수 있는<br>일주일/한 달 감정 그래프</h3>
+                    <h4>우리 가족의<br>이번 주 감정 점수를<br>확인해 보세요.</h4>
+                </div>
+            </div>
+            <!-- 슬라이드 2 -->
+            <div class="slide">
+                <img src="{% static 'images/land_pg/Group 35104.svg'%}" alt="슬라이드 2">
+                <div class="text02">
+                    <h1>AI Solution</h1>
+                    <h3>일기로 알 수 있는<br>해당 날의 나의 성격유형</h3>
+                    <h4>매일 AI가 분석해 주는<br>섬세하고 다양한 성격유형들</h4>
+                </div>
+            </div>
+            <!-- 슬라이드 1 -->
+            <div class="slide">
+                <img src="{% static 'images/land_pg/Group 35103.svg'%}" alt="슬라이드 1">
+                <div class="text01">
+                    <h1>감정의 흐름이 궁금하시죠?<br>서로의 감정을 알아보아요</h1>
+                    <h3>한눈에 확인할 수 있는<br>일주일/한 달 감정 그래프</h3>
+                    <h4>우리 가족의<br>이번 주 감정 점수를<br>확인해 보세요.</h4>
+                </div>
+            </div>
+            <!-- 슬라이드 2 -->
+            <div class="slide">
+                <img src="{% static 'images/land_pg/Group 35104.svg'%}" alt="슬라이드 2">
+                <div class="text02">
+                    <h1>AI Solution</h1>
+                    <h3>일기로 알 수 있는<br>해당 날의 나의 성격유형</h3>
+                    <h4>매일 AI가 분석해 주는<br>섬세하고 다양한 성격유형들</h4>
+                </div>
+            </div>
+            <!-- 슬라이드 1 -->
+            <div class="slide">
+                <img src="{% static 'images/land_pg/Group 35103.svg'%}" alt="슬라이드 1">
+                <div class="text01">
+                    <h1>감정의 흐름이 궁금하시죠?<br>서로의 감정을 알아보아요</h1>
+                    <h3>한눈에 확인할 수 있는<br>일주일/한 달 감정 그래프</h3>
+                    <h4>우리 가족의<br>이번 주 감정 점수를<br>확인해 보세요.</h4>
+                </div>
+            </div>
+        </div>
+        <!-- 멤버십 정보 -->
+        <div id="subInfo">
+            <h1>멤버십을 구독으로<br>더 다양한 기능을 무제한으로 이용해보세요!</h1>
+            <h2>다이어리도 스마트하게!</h2>
+            <h3>광고로 끊김 없는 다이어리 작성 ✨, 내 다이어리 pdf로 평생 저장 📚<br>
+                오직 프리미엄에서만!<br>
+                감정 심리 AI 통계 분석 제공 🤖 </h3>
+            <h5><u>1개월 무료 체험 이후 ₩2,500/월 * VAT 포함 * 언제든지 취소 가능</u></p>
+                <h6>무료 체험판이 종료되기 7일 전에 알림이 전송됩니다. 정기 결제이며<br>
+                    <span style="color: #065FD4;">제한사항이 적용됩니다.</span>
+                </h6>
+                <a href="#">
+                    <div class="freetrial">무료로 1개월 체험하기</div>
+                </a>
+        </div>
+        <!-- 질문 -->
+        <div id="qBox">
+            <h1>자주 묻는 질문</h1>
+            <div class="line-container">
+                <div class="question-group">
+                    <a href="#">
+                        <h3 class="question">멤버십 결제는 어떻게 하는지 궁금해요. <img src="{% static 'images/land_pg/rightgt.svg'%}" alt="아이콘"></h3>
+                    </a>
+                    <div class="line"></div>
+                </div>
+                <div class="question-group">
+                    <a href="#">
+                        <h3 class="question">멤버십 혜택은 어떤 것이 있나요? <img src="{% static 'images/land_pg/rightgt.svg'%}" alt="아이콘"></h3>
+                    </a>
+                    <div class="line"></div>
+                </div>
+                <div class="question-group">
+                    <a href="#">
+                        <h3 class="question">멤버십을 취소할 수 있나요? <img src="{% static 'images/land_pg/rightgt.svg'%}" alt="아이콘"></h3>
+                    </a>
+                    <div class="line"></div>
+                </div>
+                <div class="question-group">
+                    <a href="#">
+                        <h3 class="question">프리미엄 기능에 대해 자세히 알려주세요. <img src="{% static 'images/land_pg/rightgt.svg'%}" alt="아이콘"></h3>
+                    </a>
+                    <div class="line"></div>
+                </div>
+                <div class="question-group">
+                    <a href="#">
+                        <h3 class="question">결제 수단을 변경하려면 어떻게 해야 하나요? <img src="{% static 'images/land_pg/rightgt.svg'%}" alt="아이콘"></h3>
+                    </a>
+                    <div class="line"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- main -->
+
+    <!-- footer -->
+
+
+</body>
+
+</html>

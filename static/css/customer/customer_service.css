@@ -1,0 +1,277 @@
+/* 기본틀 */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
+}
+
+a{
+  text-decoration: none;
+}
+
+body, html {
+  height: 100%;
+}
+
+
+table, tr, td{
+  border-collapse: collapse;
+  color: #333;
+  font-size: 14px;
+}
+
+/* container */
+/* 좌측 네비와 연결할 때 컨테이너 패딩값 변경
+왼쪽 패딩 / 위쪽 패딩 */
+#container{
+  width: 100%;
+  min-height: 100vh; /* 화면 높이와 동일하게 설정 */
+  padding: 100px 180px 300px 334px;
+}
+
+/* 고객 센터 상단 */
+#customer_service_top{
+  width: 100%;
+  margin-bottom: 60px;
+  overflow: hidden;
+  position: relative;
+  z-index: 10; /* 상단바의 z-index보다 낮게 설정 */
+}
+
+#customer_service_top h2{
+  font-size: 20px;
+  font-weight: medium;
+  margin-bottom: 50px;
+}
+
+#customer_service_top span{
+  font-size: 24px;}
+
+#customer_service_top .how_dairy{
+  display: flex;
+  transition: transform 0.3s ease-in-out;
+  touch-action: pan-y; /* 수직 스크롤 방해 방지 */
+}
+
+#customer_service_top .how_dairy div{
+  background: #D9D9D9;
+  min-width: 340px;
+  height: 340px;
+  margin: 20px 20px 0 0;
+  border-radius: 20px;
+}
+
+#customer_service_top .how_dairy p{
+  font-size: 18px;
+  color: #444;
+  width: 160px;
+  height: 60px;
+  margin: 37px 0 0 30px;
+}
+
+/* 공지사항 부분 */
+#customer_service_notice{
+  margin-bottom: 80px;
+}
+
+#customer_service_notice span{
+  font-size: 24px;
+} 
+
+.customer_service_notice_table{
+  border: 1px solid #f6f6f6;
+  /* box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1); */
+  border-radius: 20px;
+  background: #f5f5f5;
+  box-shadow: 20px 20px 60px #e7e7e7d2,-20px -20px 60px #ffffff;
+  margin-top: 20px;
+}
+
+#customer_service_notice table{
+  margin: 20px 0;
+  width: 100%;
+}
+
+#customer_service_notice table tr:hover {
+  border-radius: 20px;
+  background-color: #fafafa;
+  cursor: pointer;
+}
+
+
+#customer_service_notice table td{
+  height: 46px;
+  font-size: 18px;
+  color: #000;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+#customer_service_notice table td:nth-child(2){
+  text-align: left;
+}
+
+#customer_service_notice table tr:last-child{
+ height: 50px;
+ padding-top: 30px;
+}
+
+
+#customer_service_notice table td a{
+  color: #333;
+}
+
+
+#customer_service_notice .notice_list_last span{
+  width: 130px;
+  height: 24px;
+  font-size: 18px;
+  align-items: center; 
+  text-align: center;
+  display: inline-block;
+}
+
+.notice_list_last img{
+  vertical-align: middle; 
+}
+
+.notice_list_last {
+  justify-content: center;        
+  align-items: center; 
+}
+
+/* 자주 묻는 질문 */
+#customer_service_qna{
+  margin-bottom: 80px;
+}
+
+#customer_service_qna span{
+  font-size: 24px;
+} 
+
+.customer_service_qnabox{
+  border: 1px solid #f6f6f6;
+  border-radius: 20px;
+  background: #f5f5f5;
+  box-shadow: 20px 20px 60px #e7e7e7d2,-20px -20px 60px #ffffff;
+  margin-top: 20px;
+
+  margin-top: 20px;
+}
+
+/* .customer_service_qnabox div{
+  border-bottom: 1px solid #DBDBDB;
+} */
+
+.customer_service_q {
+  height: 60px;
+  padding: 21px 32px;
+  /* border-bottom: 1px solid #DBDBDB; */
+  font-size: 17px;
+  color: #222;
+  cursor: pointer;
+}
+.customer_service_q:hover {
+  background-color: #f0f0f0; /* 원하는 배경색 */
+  cursor: pointer; /* 마우스를 올렸을 때 포인터 커서 */
+  border-radius: 20px;
+}
+
+.customer_service_q strong{
+  margin-right: 10px;
+}
+
+.customer_service_a{
+  display: none; /* 처음엔 숨김 */
+  padding: 10px;
+  background: #ffffff;
+  box-shadow: inset 14px 18px 17.1px rgba(255, 255, 255, 0.27);
+}
+
+.customer_service_a strong{
+  margin-right: 3px;
+}
+
+.customer_service_a p{
+  font-size: 17px;
+  color: #222;
+  margin: 20px 0 20px 20px;
+}
+
+.customer_service_a hr{
+  border: 1px solid #f1f1f1;
+}
+
+/* 1:1 문의 */
+#customer_service_request{
+  margin-bottom: 80px;
+}
+
+#customer_service_request span{
+  font-size: 24px;
+} 
+
+.customer_service_request_box{
+  display: flex;
+  border: 1px solid #ddd;
+  box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+  margin-top: 20px;
+}
+
+.customer_service_request_input{
+  width: 40%;
+  margin: 33px 50px;
+}
+.customer_service_request_input input{
+  width: 500px;
+  height: 48px;
+  border: 1px solid #DBDBDB;
+  margin-bottom: 10px;
+  padding: 10px;
+}
+
+.customer_service_request_input textarea{
+  width: 500px;
+  height: 200px;
+  margin-bottom: 10px;
+  padding: 10px;
+  border: 1px solid #DBDBDB;
+  resize: none;
+  outline: none;
+}
+
+.customer_service_request_agree{
+  padding: 33px 30px;
+}
+
+.customer_service_request_agree p{
+  font-size: 16px;
+  color: #0F0F0F;
+  margin-bottom: 10px;
+}
+
+.agree_txt{
+  border: 1px solid #DBDBDB;
+  font-size: 15px;
+  line-height: 18px;
+  color: #ACB1C6;
+  padding: 10px;
+}
+
+.agree_chk{
+  float: right;
+  margin-top: 15px;
+}
+
+.agree_chk button{
+  width: 150px;
+  height: 45px;
+  background: white;
+  font-size: 15px;
+  border: 1px solid #ACB1C6;
+  color: #ACB1C6;
+  margin-left: 10px;
+  cursor: pointer;
+}
+

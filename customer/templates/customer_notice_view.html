@@ -1,0 +1,106 @@
+{% extends 'main_navi_base.html' %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
+  <title>notice view</title>
+</head>
+<body>
+  <!-- 프로필 -->
+  {% block profill-block%}
+  <div id="user_profile">
+    <div id="pimg">
+      <img src="{{ qb.img.url }}" alt="" />
+    </div>
+    <p id="uName" >{{mem_info.name}}</p>
+    <p id="uEmail">{{mem_info.mail}}</p>
+  </div>
+
+  	<!-- Nav -->
+		<nav id="menu">
+			<ul>
+				<a href="/main/index/"><li class="menu_item">우리 가족 이야기</li></a>
+				<a href="/diary/diaryHome/"><li class="menu_item">다이어리</li></a>
+				<a href="/emotion/main/"><li class="menu_item">감정 돌아보기</li></a>
+				<a href="/family1/fam/"><li class="menu_item">우리가족</li></a>
+				<a href="/calendar1/cal/"><li class="menu_item">캘린더</li></a>
+				<a href="/customer/"><li class="menu_item active">알려드려요</li></a>
+			</ul>
+		</nav>
+
+  {% endblock profill-block%}
+
+  {% block container-block%}
+
+  <div id="container">
+    <div id="customer_notice_menu">
+      {% if view.category == 1 %}
+      <h2>공지사항</h2>
+      <span>NOTICE</span>
+      {% elif view.category == 2 %}
+      <h2>포스트</h2>
+      <span>POST</span>
+      {% endif %}
+    </div>
+    
+    <div id="customer_view_top">
+      <div class="customer_view_title">
+        <h2>{{view.btitle}}</h2>
+        <span>{{view.bdate|date:'Y-m-d'}}</span>
+        <span>{{view.member.nickname}}</span>
+      </div>
+      <div id="modify_del_slide_1">
+        <img src="/static/images/customer/addBtn.png" alt="" id="openModal_1" style="cursor: pointer;"> <!-- 커서 포인터 추가 -->
+        <div class="sub_menu_modal" id="sub_menu_modal_1">
+          <div id="sub_menu_content">
+            <button id="editButton_1">수정</button>
+            <button id="deleteButton_1">삭제</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="customer_content">
+      {% if view.bfile %}
+      <img src="{{view.bfile.url}}" alt="{{view.bfile}}">
+			{% endif %}
+      <p>{{view.bcontent}}</p>
+    </div>
+    {% if view.category == 1 %}
+    <div class="customer_react">
+      <div class="back_list" id="back_click">
+        <span>목록</span>
+      </div>
+    </div>
+    {% elif view.category == 2 %}
+    <div class="customer_react">
+      <div class="back_write" id="back_write" onclick="goToDiaryWrite()">
+        <span>일기 작성하러 가기</span>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+  <script>
+    // 첫 번째 모달 열기/닫기
+    document.getElementById('openModal_1').addEventListener('click', function() {
+      var modal = document.getElementById('sub_menu_modal_1');
+      modal.classList.toggle('open'); // open 클래스가 있으면 제거, 없으면 추가
+    });
+
+    
+    document.getElementById('back_click').addEventListener('click', function() {
+      location.href='/customer/noticelist/'
+    });
+
+    function goToDiaryWrite() {
+      location.href = '/diary/diaryWrite/';
+    }
+  </script>
+
+  {% endblock container-block%}
+
+</body>
+</html>

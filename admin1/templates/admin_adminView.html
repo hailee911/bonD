@@ -1,0 +1,93 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdeliv.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
+<link rel="stylesheet" href="{% static 'css/admin1/admin_memAdd.css'%}">
+<link rel="stylesheet" href="{% static 'css/admin1/admin_login.css'%}">
+<script  src="http://code.jquery.com/jquery-latest.min.js"></script>
+<title>관리자정보</title>
+<script>
+	$("#a_logout").click(function(){
+		if(confirm("로그아웃 하시겠습니까?")){
+			location.href='/admin1/logout/'
+		}
+	})
+	if("{{dmsg}}"!=''){
+		alert("{{dmsg}} 를 삭제했습니다.")
+		location.href = '/admin1/admin_adminList/'
+	}
+	$(function(){
+		$("#updateBtn").click(function(){
+			alert("{{admin.name}} 님 회원 정보 수정페이지로 이동합니다.")
+			location.href = '/admin1/admin_adminUpdate/{{admin.id}}/'
+		})
+		$("#cBtn").click(function(){
+			location.href='/admin1/admin_adminList/'
+		})
+		$("#delBtn").click(function(){
+			if(confirm("{{admin.name}} 관리자님 삭제하시겠습니까? 삭제시 복구가 불가능합니다.")){
+				location.href = '/admin1/admin_adminDelete/{{admin.id}}/'
+			}
+		})
+	});
+</script>
+</head>
+<body>
+	<nav class="gnb">
+		<a href="/admin1/admin_memList/" class="logo"><img src="/static/images/admin1/logo_sample.png" alt=""></a>
+		<div class="menu">
+			<a href="/admin1/admin_memList/" class='active'>회원관리</a>
+			<a href="#">판매관리</a>
+			<a href="/admin1/admin_noticeList/">공지사항</a>
+			<a href="/admin1/admin_postList/">포스트</a>
+			<a href="/admin1/admin_qList/" >1:1문의</a>
+			<a href="/admin1/admin_adminList/">관리자설정</a>
+			<a id='a_logout'>로그아웃</a>
+		</div>
+	</nav>
+	<div class="container">
+		<div class="con_header">
+			<h2>{{admin.name}} 관리자님 정보</h2>
+		</div>
+		<form action="" method="POST" id="addFrm" name="addFrm">
+			{% csrf_token %}
+			<label for="admin_id">아이디</label>
+			<br>
+			<input type="text" id="admin_id" name="admin_id" value="{{admin.id}}" style="border:0; font-size:17px; font-weight:600" required readonly>
+			<br>
+			<label for="user_id">비밀번호</label>
+			<br>
+			<input type="text" id="admin_pw" name="admin_pw" value="{{admin.pw}}" style="border:0; font-size:17px; font-weight:600" required readonly>
+			<br>
+			<label for="admin_name">관리자 이름</label>
+			<br>
+			<input type="text" id="admin_name" name="admin_name" value="{{admin.name}}" style="border:0; font-size:17px; font-weight:600" required readonly>
+			<br>
+			<label for="nickname">닉네임</label>
+			<br>
+			<input type="text" id="nickname" name="nickname" value="{{admin.nickname}}" style="border:0; font-size:17px; font-weight:600" readonly>
+			<br>
+			<label for="role">롤</label>
+			<br>
+			<input type="text" id="role" name="role" value="{{admin.role}}" style="border:0; font-size:17px; font-weight:600" readonly>
+			<br>
+			<label for="tel">전화번호</label>
+			<br>
+			<input type="text" id="tel" name="tel" value="{{admin.tel}}" style="border:0; font-size:17px; font-weight:600" required readonly>
+			<br>
+			<label for="adate">등록일</label>
+			<br>
+			<input type="date" id="adate" name="adate" value="{{admin.adate|date:'Y-m-d'}}" style="border:0; font-size:17px; font-weight:600" required readonly>
+			<br>
+			<button type="button" id='updateBtn'>수정하기</button>
+			<button type="button" id='delBtn'>관리자삭제</button>
+			<button type="button" id='cBtn'>뒤로가기</button>
+		</form>
+	</div>
+
+
+</body>
+</html>

@@ -1,0 +1,577 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="csrf-token" content="{{ csrf_token }}">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
+<link rel="stylesheet" href="{% static '/css/home/main.css' %}">
+<script  src="http://code.jquery.com/jquery-latest.min.js"></script>
+<title>우리의 기록</title>
+<style>
+
+</style>
+
+
+<script>
+	
+	$(function() {
+		// GNB 클릭
+		$('#menu ul li').on('click', function() {
+			$('#menu ul li').removeClass('active');
+			$(this).addClass('active');
+		});
+
+		// 검색창
+		$('#searchBtn').click(function(){
+				$("#main_search").removeClass('closed').addClass('open');
+				$('#s_overlay').addClass('show');
+			});
+		$('#search_closeBtn').click(function(){
+			$("#main_search").removeClass('open').addClass('closed');
+			$('#s_overlay').removeClass('show');
+		});
+		$('#s_overlay').click(function() { //배경 클릭하면 닫히게
+			$('#main_search').removeClass('open').addClass('closed');
+			$('#s_overlay').removeClass('show');
+		});
+
+		// 검색창 검색기능
+    $('.search_box input').on('keypress', function(event){
+      if (event.key == 'Enter') {
+        // 입력값과 일치하는 일기 찾기
+        alert("데이터가 검색되었습니다.")
+        ctitle = "{{Content.ctitle}}"
+        cdate = "{{Content.cdate}}"
+        ccontent = "{{Content.ccontent}}"
+        //ajax 구문
+        $.ajax({
+          headers:{"X-CSRFToken":$("meta[name='csrf-token']").attr("content")},
+          url:"/main/search/",
+          type:"post",
+          data:{"csearch":$("#csearch").val()}, //views.py데이터 보냄
+          success:function(data){
+            //data -> 넘어온 검색결과
+            console.log("리스트 : "+data.list_qs)
+            console.log("리스트 : "+data.list_qs[0])
+            console.log("리스트개수 : "+data.list_qs.length)
+            //html보내는 부분
+            var hdata = ""
+            hdata += `<div id="search_result">검색 결과 <span>(${data.list_qs.length})</span></div>`
+            for(var i=0;i<data.list_qs.length;i++){
+              hdata += `<div class="search_list"><a href="/diary/diaryView/">
+              <span class="s_title"> ${data.list_qs[i].ctitle}</span>
+                    <span class="s_date">${data.list_qs[i].cdate}</span>
+                    <img src="/static/images/home/right.png" alt="">
+                    </a>
+                    </div>`
+            }
+                $("#search_content").html(hdata)
+              },
+              error:function(){
+                alert("에러")
+              }
+            })
+          }
+          event.preventDefault(); // 기본 제출 방지
+    });
+
+
+		
+	});
+
+	// -------------알림창-----------------
+	$(function() {
+    // 페이지 로드 시 알림 상태 확인
+    fetchNotifications();
+
+    // 알림창 열기
+    $('#notiBtn').click(function() {
+        $('#noti_side').removeClass('closed').addClass('open');
+        $('#n_overlay').addClass('show');
+
+        // 알림 데이터 가져오기
+        fetchNotifications();
+    });
+
+    // 알림창 닫기
+    $('#noti_closeBtn, #n_overlay').click(function() {
+        $('#noti_side').removeClass('open').addClass('closed');
+        $('#n_overlay').removeClass('show');
+    });
+
+    // 알림 데이터 가져오는 함수
+    function fetchNotifications() {
+        $.ajax({
+            url: '/main/notification/', // 알림 데이터를 가져올 URL
+            method: 'GET',
+            success: function(data) {
+                let hasUnread = false; // 읽지 않은 알림 여부
+                let hdata = ""; // 알림 내용을 담을 HTML
+
+                if (data.notifications.length > 0) {
+                    data.notifications.forEach(function(notification) {
+                        if (!notification.checked) {
+                            hasUnread = true; // 읽지 않은 알림 존재
+                        }
+                        hdata += `
+                            <li class="noti_list ${notification.checked ? 'checked' : ''}" data-id="${notification.id}">
+                                <a>
+                                    <div>
+                                        <img src="/static/images/home/default_profile.png" alt="프로필이미지">
+                                    </div>
+                                    <div>
+                                        <p>${notification.message}</p>
+                                        <p class="noti_date">${notification.ndate}</p>
+                                    </div>
+                                </a>
+                            </li>
+                        `;
+                    });
+                } else {
+                    hdata = `
+                        <li class="noti_list">
+                            <p>새로운 알림이 없습니다.</p>
+                        </li>
+                    `;
+                }
+
+                $('#noti_list').html(hdata); // 알림 UI 업데이트
+
+                // 빨간 점 표시
+                if (hasUnread) {
+                    $('#notiBtn .notification-dot').show(); // 읽지 않은 알림이 있으면 빨간 점 표시
+                } else {
+                    $('#notiBtn .notification-dot').hide(); // 없으면 숨김
+                }
+            },
+            error: function(error) {
+                console.error('Error fetching notifications:', error);
+            }
+        });
+    }
+
+    // 알림 리스트 클릭 시 배경색 변경 및 읽음 처리
+    $('#noti_list').on('click', '.noti_list', function () {
+        const notificationId = $(this).data('id'); // 알림 ID 가져오기
+
+        if (notificationId) {
+            $(this).addClass('read'); // 읽음 상태로 변경
+            $(this).css('background-color', 'white'); // 즉시 배경색 변경
+
+            // 서버에 읽음 상태 동기화 요청
+            markNotificationAsRead(notificationId);
+        }
+    });
+
+    // 알림 읽음 처리 함수
+    function markNotificationAsRead(notificationId) {
+        $.ajax({
+            url: `/main/notification_read/${notificationId}/`, // 알림 읽음 처리 URL
+            method: 'POST',
+            headers: { 'X-CSRFToken': $("meta[name='csrf-token']").attr("content") },
+            success: function () {
+                console.log('Notification marked as read.');
+                // 읽음 상태 업데이트 후 빨간 점 재확인
+                fetchNotifications();
+            },
+            error: function (error) {
+                console.error('Error marking notification as read:', error);
+            }
+        });
+    }
+
+    // 5초마다 읽지 않은 알림 상태 확인
+    setInterval(fetchNotifications, 5000);
+});
+
+
+
+
+</script>
+</head>
+<body>
+	<!-- 최상단 메뉴 -->
+	<div id="top_nav">
+		<h1><a href="#"></a></h1>
+		<ul class="top_menu">
+			<li><a id="searchBtn"><img src="/static/images/home/search_icon.png" alt=""></a></li>
+			<li>
+				<a id="notiBtn">
+						<img src="/static/images/home/bell_off_icon.png" alt="">
+						<span class="notification-dot"></span> <!-- 빨간점을 표시할 요소 추가 -->
+				</a>
+		</li>
+			<li><a href="/mypage/main/">마이페이지</a></li>
+		</ul>
+
+	</div>
+
+	<!-- 좌측 gnb -->
+	<div id="gnb">
+
+		<!-- 프로필 -->
+		<div id="user_profile">
+			<div id="pimg">
+				<img src="/static/images/home/default_profile.png" alt="">
+			</div>
+			<p id="uName">김용준</p>
+			<p id="uEmail">kyjoon0105@gmail.com</p>
+		</div>
+
+		<!-- Nav -->
+		<nav id="menu">
+			<ul>
+				<a href="/main/index/"><li class="menu_item active">우리 가족 이야기</li></a>
+				<a href="/diary/diaryHome/"><li class="menu_item">다이어리</li></a>
+				<a href="/emotion/main/"><li class="menu_item">감정 돌아보기</li></a>
+				<a href="/family1/fam/"><li class="menu_item">우리가족</li></a>
+				<a href="/calendar1/cal/"><li class="menu_item">캘린더</li></a>
+				<a href="/customer/"><li class="menu_item">알려드려요</li></a>
+			</ul>
+		</nav>
+
+		<!-- logout -->
+		<div id="logout">
+			<a href="#"><span>로그아웃</span></a>
+		</div>
+		
+	</div>
+	
+
+	<!-- 검색창 슬라이드 -->
+	<div id="s_overlay" class="s_overlay"></div>
+	<div id="main_search" class="search_bar closed">
+		<div id="input_wrap">
+			<form action="/main/search/" method="POST" name="searchFrm" id="searchFrm">
+				<div class="search_box">
+					{% csrf_token %}
+					<input type="text" id="csearch" placeholder="다이어리에서 찾고 싶은 내용을 입력하세요.">
+					<img src="/static/images/home/search_icon.png" alt="">
+				</div>
+			</form>
+				<button type="button" id="search_closeBtn">
+					<img src="/static/images/home/close_icon.png" alt="알림창닫기">
+				</button>
+		</div>
+			<div id="search_content">
+				<div id="search_result">
+					검색 결과 <span>(0)</span>
+				</div>
+				<div class="search_list">
+					<a>
+						<span class="s_title">찾고자 하는 일기를 검색해 보세요.</span>
+						<span class="s_date"></span>
+						<img src="/static/images/home/right.png" alt="">
+					</a>
+				</div>
+			</div>
+		</div>
+	
+	
+	<!-- 알림창 슬라이드 -->
+	<div id="n_overlay" class="n_overlay"></div>
+	<div id="noti_side" class="sidebar closed">
+		<div class="noti_header">
+			<h2>알림</h2>
+			<button id="noti_closeBtn"><img src="/static/images/home/close_icon.png" alt="알림창닫기"></button>
+    </div>
+    <ul id="noti_list">
+			{% for notification in notifications %}
+			<li class="noti_list {% if notification.checked %}checked{% endif %}">
+					<a href="#">
+							<div>
+									<img src="/static/images/home/default_profile.png" alt="프로필이미지">
+							</div>
+							<div>
+									<p>{{ notification.message }}</p>
+									<p class="noti_date">{{ notification.ndate|date:"Y-m-d H:i" }}</p>
+							</div>
+					</a>
+			</li>
+			{% empty %}
+			<li class="noti_list">
+					<p>새로운 알림이 없습니다.</p>
+			</li>
+			{% endfor %}
+	</ul>
+	</div>
+	
+
+
+
+	<!-- container -->
+	<div id="container">
+
+		<div id="main_sec1">
+
+			<div id="rec1"></div>
+
+			<div id="diary_txt">
+				<div id="d_txt" class="main_txt">
+					<p>나의 가장 사소한 일상은<br>
+						우리 가족에겐 가장 소중한 이야기에요<br>
+						가족과 함께 소중한 추억의 한 페이지를 엮어 보세요.
+					</p>
+				</div>
+				<button type="button" onclick="" class="main_btn">일상 공유하기&nbsp&nbsp&nbsp></button>
+			</div>
+			
+			<div id="diary_list">
+				<div class="diary_list_wrapper">
+						<button id="main_wbtn" type="button">+</button>
+						<!-- 반복부분 -->
+						<div id="dlist">
+							<p class="dlist_type">My Diary</p>
+							<p class="dlist_title">내가 한 말을 내가 오해하지 않기로 함</p>
+							<div>
+								<p class="dlist_date">2022-11-28<br>~</p>
+							</div>
+						</div>
+						<div id="dlist">
+							<p class="dlist_type">Family Diary</p>
+							<p class="dlist_title">우리 가족 추억보관함</p>
+							<div>
+								<p class="dlist_date">2022-11-28<br>~</p>
+							</div>
+						</div>
+						<div id="dlist">
+							<p class="dlist_type">My Diary</p>
+							<p class="dlist_title">내가 한 말을 내가 오해하지 않기로 함</p>
+							<div>
+								<p class="dlist_date">2022-11-28<br>~</p>
+							</div>
+						</div>
+
+				</div>
+			</div>
+
+		</div>
+
+		<div id="main_sec2">
+			<!-- 포스트 카드 섹션 -->
+			<div id="main_card">
+				<div class="main_txt">
+					<p>
+						사랑하는 가족을<br>
+						더 알아가는 방법을<br>
+						소개해 드릴게요.
+					</p>
+					<div id="card_arrow">
+						<p><img id="left_arrow" src="/static/images/home/left_card.png" alt="이전카드"></p>
+						<p><img id="right_arrow" src="/static/images/home/right_card.png" alt="다음카드"></p>
+					</div>
+				</div>
+				<div id="card_list">
+					{% if post_lists %}
+						{% for post in post_lists %}
+						<div class="cards" style="background-image: url('{{ post.bfile_thumbnail.url }}');">
+						</div>
+						{% endfor %}
+					{% else %}
+						<div class="cards">
+							<p class="card_title">내용이 없ㅅ브니다.</p>
+						</div>
+					{% endif %}
+				</div>
+			</div>
+			<!--카드 슬라이드 스크립트-->
+			<script>
+				$(function(){
+					$("#card_list").click(function(){
+						location.href='/customer/'
+					})
+				})
+				document.addEventListener('DOMContentLoaded', () => {
+					const cards = document.querySelectorAll('.cards');
+					const leftArrow = document.getElementById('left_arrow');
+					const rightArrow = document.getElementById('right_arrow');
+					let currentIndex = 0; // 현재 활성화된 카드의 인덱스
+					const slideInterval = 5000; // 자동 슬라이드 시간 간격 (밀리초)
+					const cardCount = cards.length;
+			
+					// 카드 초기 상태 설정
+					cards.forEach((card, index) => {
+							card.style.position = 'absolute';
+							card.style.top = 0;
+							card.style.left = 0;
+							card.style.transition = 'opacity 0.5s ease';
+							card.style.opacity = index === 0 ? 1 : 0; // 첫 번째 카드만 보임
+							card.style.zIndex = index === 0 ? 10 : 0; // 첫 번째 카드가 맨 위
+					});
+			
+					// 카드 전환 함수
+					const showSlide = (nextIndex) => {
+							cards[currentIndex].style.opacity = 0; // 현재 카드 숨김
+							cards[currentIndex].style.zIndex = 0; // z-index 낮춤
+			
+							cards[nextIndex].style.opacity = 1; // 다음 카드 표시
+							cards[nextIndex].style.zIndex = 10; // z-index 올림
+			
+							currentIndex = nextIndex; // 현재 인덱스 갱신
+					};
+			
+					// 이전 카드로 이동
+					const moveToPrevious = () => {
+							const nextIndex = (currentIndex - 1 + cardCount) % cardCount;
+							showSlide(nextIndex);
+					};
+			
+					// 다음 카드로 이동
+					const moveToNext = () => {
+							const nextIndex = (currentIndex + 1) % cardCount;
+							showSlide(nextIndex);
+					};
+			
+					// 자동 슬라이드 설정
+					let autoSlide = setInterval(moveToNext, slideInterval);
+			
+					// 화살표 클릭 이벤트
+					leftArrow.addEventListener('click', () => {
+							clearInterval(autoSlide); // 자동 슬라이드 중지
+							moveToPrevious();
+							autoSlide = setInterval(moveToNext, slideInterval); // 자동 슬라이드 재개
+					});
+			
+					rightArrow.addEventListener('click', () => {
+							clearInterval(autoSlide); // 자동 슬라이드 중지
+							moveToNext();
+							autoSlide = setInterval(moveToNext, slideInterval); // 자동 슬라이드 재개
+					});
+			
+					// 카드 위에 마우스를 올리면 자동 슬라이드 중지
+					const cardList = document.getElementById('card_list');
+					cardList.addEventListener('mouseenter', () => clearInterval(autoSlide));
+					cardList.addEventListener('mouseleave', () => autoSlide = setInterval(moveToNext, slideInterval));
+			});
+			
+			</script>
+			<!-- 포스트 카드 섹션 -->
+
+			<div id="happy_rate">
+				<div class="main_txt">
+					<p>
+						우리 가족의<br>
+						이번 주 감정 점수를<br>
+						확인해 보세요.
+						<br>
+						<br>
+					</p>
+					<button type="button" onclick="" class="main_btn">자세히 보기&nbsp&nbsp&nbsp></button>
+				</div>
+				<div id="happy_graph">
+
+				</div>
+			</div>
+		</div>
+
+		<div id="main_sec3">
+			<div id="lastest_diary">
+				<div class="main_txt">
+					<p>최신 일상들</p>
+				</div>
+				<table id="ldairy_list">
+					<colgroup>
+						<col style="width: 360px;">
+						<col style="width: 80px;">
+						<col style="width: 120px;">
+					</colgroup>
+					<tr>
+						<th>지갑 잃어버렸다 찾은 날</th>
+						<td>배현지</td>
+						<td>2024.12.03</td>
+					</tr>
+					<tr>
+						<th>지갑 잃어버렸다 찾은 날</th>
+						<td>배현지</td>
+						<td>2024.12.03</td>
+					</tr>
+					<tr>
+						<th>지갑 잃어버렸다 찾은 날</th>
+						<td>배현지</td>
+						<td>2024.12.03</td>
+					</tr>
+					<tr>
+						<th>지갑 잃어버렸다 찾은 날</th>
+						<td>배현지</td>
+						<td>2024.12.03</td>
+					</tr>
+					<tr>
+						<th>지갑 잃어버렸다 찾은 날</th>
+						<td>배현지</td>
+						<td>2024.12.03</td>
+					</tr>
+				</table>
+			</div>
+
+			<div id="past_diary">
+				<div class="main_txt">
+					<p>과거의 오늘</p>
+				</div>
+				<div class="sub_t">
+					<span>1 년 전 오늘 다이어리에는 이런 내용이 있었어요.</span>
+				</div>
+				<div id="past_area">
+					<div>
+						<p class="p_txt">
+							오늘만 정말 기다리고 기다렸다. 왜냐면 오늘 바로 바로 딤섬여왕 정지선셰프의 식당을 예약한 날이기 때문이다. 딤섬을 많이 먹으려고 점심도 조금 먹었는데 배가 너무 고파서 음식이 나올 때까지 기다리다가 기절할 뻔 했다. 드디어 첫 딤섬이 나왔는데.. 너무 맛있어서 소리를 질러 버렸다. 주변사람들한테 너무 민폐를 끼친거 같아 너무 부끄러웟따...... 그럼에도 불구하고 네버더레스 나는
+						</p>
+						<span>
+							...
+						</span>
+					</div>
+					<div id="p_button">
+						<button type="button" onclick="" class="main_btn">더 보러가기&nbsp&nbsp&nbsp></button>
+					</div>
+
+				</div>
+			</div>
+
+		</div>
+	</div>
+		
+	<!-- footer -->
+	<div id="footer">
+		<div id="f_logo_wrap">
+			<img src="/static/images/home/logo_white_sample.png" alt="">
+		</div>
+		<div id="f_link">
+			<ul>
+				<li><a href="">공지사항 보기</a></li>
+				<li>|</li>
+				<li><a href="">포스트 보기</a></li>
+				<li>|</li>
+				<li><a href="">개인정보처리방침</a></li>
+				<li>|</li>
+				<li><a href="/admin1/login/">관리자페이지(임시링크)</a></li>
+			</ul>
+		</div>
+		<div id="f_txt">
+			<ul>
+				<li>상호 : (주)프로젝트파이터</li>
+				<li>|</li>
+				<li>대표자 : 홍길동</li>
+				<li>|</li>
+				<li>개인정보보호책임 : 유관순</li>
+			</ul>
+			<ul>	
+				<li>사업자등록번호 : 123-45-67890</li>
+				<li>|</li>
+				<li>통신판매업신고번호 : 제1234-서울금천-5678호</li>
+			</ul>
+			<ul>	
+				<li>주소 : 서울 금천구 가산디지털2로 101 한라원앤원타워 B동 3층</li>
+				<li>|</li>
+				<li>고객센터 : 02-1234-5678</li>
+			</ul>
+			
+		</div>
+	</div>
+		
+		
+		
+
+
+</body>
+</html>
